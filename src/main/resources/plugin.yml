@@ -1,0 +1,13 @@
+main: de.leonheuer.skycave.minievents.MiniEvents
+name: MiniEvents
+author: Hakuyamu
+version: 1.1.0
+api-version: 1.16
+depend:
+  - SkyBeeCore
+
+commands:
+  miningcube:
+    permission: skybee.minievent.miningcube
+  lavaevent:
+    permission: skybee.minievent.lavaevent
