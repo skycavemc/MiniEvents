@@ -6,6 +6,7 @@ enum class Message(private val message: String) {
 
     PREFIX("&e&l| &6Event &8» "),
 
+
     // mining cube general
     MINING_CUBE_NO_AREA("&cBitte leg zuerst einen Mining-Bereich fest. Siehe /miningcube help"),
     MINING_CUBE_UNKNOWN_COMMAND("&cUngültiger Befehl. Siehe /miningcube help"),
@@ -56,9 +57,44 @@ enum class Message(private val message: String) {
     MINING_CUBE_TP_SUCCESS("&aTeleportiere zur Position %pos..."),
     MINING_CUBE_TP_POSITIONS("&cBitte gib pos1 oder pos2 ein."),
 
+
     // lava event messages
     LAVA_EVENT_OUT("&c%player ist ausgeschieden."),
     LAVA_EVENT_OUT_SELF("&cDu bist ausgeschieden."),
+
+
+    // erze command
+    ORES_HEADER("&aWahrscheinlichkeiten für den Erze Generator:"),
+    ORES_CHILD("&8» &7%chance\u0025&8: &e%name"),
+    ORES_HEADER_BOOSTED("&aWahrscheinlichkeiten für den Erze Generator:\n&d&lBoost aktiv! &eMultiplikator: %multiplierx, Dauer: %durance"),
+    ORES_CHILD_BOOSTED("&8» &d%chance\u0025&8: &e%name"),
+
+    // booster command
+    BOOSTER_UNKNOWN("&cDieser Befehl existiert nicht. /booster help"),
+    BOOSTER_START("&e&lDer &3&lErzeBoost &e&lwurde gestartet! &c&lDauer: %durance, &d&lMultiplikator: %multiplierx"),
+    BOOSTER_START_LONGER("&e&lDer &3&lErzeBoost &e&lwurde auf &c&l%durance &e&lverlängert mit dem Multiplikator &d&l%multiplierx&e&l!"),
+    BOOSTER_COUNTDOWN("&8» &eDer &3ErzeBoost &ebeginnt in &c%sec Sekunden!"),
+
+    // booster start subcommand
+    BOOSTER_START_SYNTAX("&e/booster start <sekunden> <multiplikator>"),
+    BOOSTER_START_INVALID("&cBitte gib gültige Zahlen an."),
+    BOOSTER_START_SUCCESS("&aDer Booster wurde erfolgreich gestartet."),
+
+    // booster stop subcommand
+    BOOSTER_STOP_SUCCESS("&cDer Booster wurde angehalten."),
+    BOOSTER_STOP_ALREADY("&cDer Booster ist momentan nicht aktiv."),
+
+    // booster status subcommand
+    BOOSTER_STATUS("&aStatus: &7%state, &eDauer: &7%durance, &dMultiplikator: &7%multiplier"),
+
+    // booster help
+    BOOSTER_HELP_START("&b/booster start <sekunden> <multiplikator>\n&8» &7Startet den Booster"),
+    BOOSTER_HELP_STOP("&b/booster stop\n&8» &7Stoppt den Booster"),
+    BOOSTER_HELP_STATUS("&b/booster status\n&8» &7Zeigt den Status an"),
+    BOOSTER_HELP_HELP("&b/booster help\n&8» &7Zeigt Hilfe an"),
+
+    // booster boss bar
+    BOOSTER_BOSS_BAR("&3&lErzeBoost &e&laktiv! &c&lDauer: &c%durance"),
     ;
 
     fun getFormatted(): String {

@@ -1,7 +1,7 @@
 main: de.leonheuer.skycave.minievents.MiniEvents
 name: MiniEvents
 author: Hakuyamu
-version: 1.1.0
+version: 1.2.0
 api-version: 1.16
 depend:
   - SkyBeeCore
@@ -11,3 +11,7 @@ commands:
     permission: skybee.minievent.miningcube
   lavaevent:
     permission: skybee.minievent.lavaevent
+  erze:
+    aliases: ["erz", "ores", "ore"]
+  booster:
+    permission: skybee.oregen.command.booster
