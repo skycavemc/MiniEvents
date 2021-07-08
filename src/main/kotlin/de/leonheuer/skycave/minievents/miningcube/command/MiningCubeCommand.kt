@@ -2,7 +2,6 @@ package de.leonheuer.skycave.minievents.miningcube.command
 
 import de.leonheuer.skycave.minievents.MiniEvents
 import de.leonheuer.skycave.minievents.enums.Message
-import de.leonheuer.skycave.minievents.miningcube.model.MiningArea
 import de.leonheuer.skycave.minievents.util.Util
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -12,10 +11,192 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompleter {
+
+    private class GenerateSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, false, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            sender.sendMessage(Message.MINING_CUBE_GENERATE_PROCESS.getMessage())
+            Util.generateCuboidBlockArea(miningArea)
+        }
+    }
+
+    private class CreateSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 2, false, Message.MINING_CUBE_CREATE_SYNTAX
+    ) {
+        override fun execute() {
+            if (main.dataManager.isKeyExisting(args[1])) {
+                player.sendMessage(Message.MINING_CUBE_CREATE_EXISTS.getMessage()
+                    .replace("%name", args[1]))
+                return
+            }
+
+            main.dataManager.createMiningArea(args[1], player.location)
+            sender.sendMessage(Message.MINING_CUBE_CREATE_SUCCESS.getMessage()
+                .replace("%name", args[1]))
+            sender.sendMessage(Message.MINING_CUBE_CREATE_SPAWN.getMessage())
+        }
+    }
+
+    private class DeleteSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            main.dataManager.deleteMiningArea(miningArea)
+            sender.sendMessage(Message.MINING_CUBE_DELETE_SUCCESS.getMessage()
+                .replace("%name", args[1]))
+        }
+    }
+
+    private class Pos1Subcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            val world = miningArea.world
+            miningArea.world  = player.location.world
+            miningArea.from = player.location.toVector()
+            if (player.location.world != world) {
+                sender.sendMessage(Message.MINING_CUBE_POS1_WORLD_MISMATCH.getMessage())
+            } else {
+                sender.sendMessage(Message.MINING_CUBE_POS1.getMessage())
+            }
+        }
+    }
+
+    private class Pos2Subcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            val world = miningArea.world
+            miningArea.world  = player.location.world
+            miningArea.to = player.location.toVector()
+            if (player.location.world != world) {
+                sender.sendMessage(Message.MINING_CUBE_POS2_WORLD_MISMATCH.getMessage())
+            } else {
+                sender.sendMessage(Message.MINING_CUBE_POS2.getMessage())
+            }
+        }
+    }
+
+    private class SetSpawnSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            miningArea.spawn = player.location
+            sender.sendMessage(Message.MINING_CUBE_SET_SPAWN_SUCCESS.getMessage())
+        }
+    }
+
+    private class SpawnSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            val spawn = miningArea.spawn
+            if (spawn == null) {
+                player.sendMessage(Message.MINING_CUBE_SPAWN_UNSET.getMessage())
+                return
+            }
+
+            player.sendMessage(Message.MINING_CUBE_SPAWN_SUCCESS.getMessage())
+            player.teleport(spawn)
+        }
+    }
+
+    private class SetChanceSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, false, 4, true, Message.MINING_CUBE_SET_CHANCE_SYNTAX
+    ) {
+        override fun execute() {
+            try {
+                val mat = Material.valueOf(args[2].uppercase())
+                val chance = args[3].toInt()
+                if (chance < 0 || chance > 1000) {
+                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_NUMBER_OUT_OF_RANGE.getMessage())
+                    return
+                }
+                if (chance == 0) {
+                    miningArea.chances.remove(mat)
+                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_SUCCESS.getMessage()
+                        .replace("%mat", mat.toString().lowercase())
+                        .replace("%chance", chance.toString())
+                    )
+                    return
+                }
+
+                miningArea.chances[mat] = chance
+                sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_SUCCESS.getMessage()
+                    .replace("%mat", mat.toString().lowercase())
+                    .replace("%chance", chance.toString())
+                )
+                val sum = Util.getChanceSum(miningArea.chances.values)
+                if (sum > 1000) {
+                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_WARNING.getMessage().replace("%sum", sum.toString()))
+                }
+            } catch (e: IllegalArgumentException) {
+                sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_INVALID_MATERIAL.getMessage()
+                    .replace("%mat", args[1]))
+            } catch (e: NumberFormatException) {
+                sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_INVALID_NUMBER.getMessage()
+                    .replace("%number", args[2]))
+            }
+        }
+    }
+
+    private class ChancesSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, false, 2, true, Message.MINING_CUBE_AREA_NOT_GIVEN
+    ) {
+        override fun execute() {
+            if (miningArea.chances.isEmpty()) {
+                sender.sendMessage(Message.MINING_CUBE_CHANCES_UNSET.getMessage())
+                return
+            }
+
+            val sj = StringJoiner("§8, §r")
+            miningArea.chances.forEach {
+                sj.add(Message.MINING_CUBE_CHANCES_ENTRY.getFormatted()
+                    .replace("%mat", it.key.toString().lowercase())
+                    .replace("%chance", it.value.toString()))
+            }
+            sender.sendMessage(Message.MINING_CUBE_CHANCES.getMessage().replace("%entries", sj.toString()))
+        }
+    }
+
+    private class TpSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, true, 3, true, Message.MINING_CUBE_TP_SYNTAX
+    ) {
+        override fun execute() {
+            if (args[1] == "pos1") {
+                player.teleport(miningArea.from.toLocation(miningArea.world))
+                player.sendMessage(Message.MINING_CUBE_TP_SUCCESS.getMessage().replace("%pos", "1"))
+                return
+            }
+
+            if (args[1] == "pos2") {
+                player.teleport(miningArea.to.toLocation(miningArea.world))
+                player.sendMessage(Message.MINING_CUBE_TP_SUCCESS.getMessage().replace("%pos", "2"))
+                return
+            }
+
+            player.sendMessage(Message.MINING_CUBE_TP_POSITIONS.getMessage())
+        }
+    }
+
+    private class ListSubcommand(sender: CommandSender, args: Array<out String>): MiningCubeSubcommand(
+        sender, args, false, 1, false, Message.MINING_CUBE_TP_SYNTAX
+    ) {
+        override fun execute() {
+            if (main.dataManager.getMiningAreas().isEmpty()) {
+                sender.sendMessage(Message.MINING_CUBE_LIST_NONE.getMessage())
+                return
+            }
+
+            val sj = StringJoiner("§8, §7")
+            main.dataManager.getMiningAreas().forEach { sj.add(it.key) }
+            player.sendMessage(Message.MINING_CUBE_LIST.getMessage()
+                .replace("%list", sj.toString()))
+        }
+    }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
@@ -23,213 +204,28 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
             return true
         }
 
-        when(args[0]) {
-            "generate" -> {
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    sender.sendMessage(Message.MINING_CUBE_NO_AREA.getMessage())
-                    return true
-                }
-                sender.sendMessage(Message.MINING_CUBE_GENERATE_PROCESS.getMessage())
-                Util.generateCuboidBlockArea(miningArea)
-                return true
-            }
-            "pos1" -> {
-                if (sender !is Player) {
-                    main.logger.severe("This command is for players only.")
-                    return true
-                }
-
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    main.dataManager.miningArea = MiningArea(sender.location.world, sender.location.toVector(),
-                        sender.location.toVector(), HashMap(), null)
-                    sender.sendMessage(Message.MINING_CUBE_POS1.getMessage())
-                    return true
-                }
-
-                val world = miningArea.world
-                miningArea.world  = sender.location.world
-                miningArea.from = sender.location.toVector()
-                if (sender.location.world != world) {
-                    sender.sendMessage(Message.MINING_CUBE_POS1_WORLD_MISMATCH.getMessage())
-                } else {
-                    sender.sendMessage(Message.MINING_CUBE_POS1.getMessage())
-                }
-                return true
-            }
-            "pos2" -> {
-                if (sender !is Player) {
-                    main.logger.severe("This command is for players only.")
-                    return true
-                }
-
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    main.dataManager.miningArea = MiningArea(sender.location.world, sender.location.toVector(),
-                        sender.location.toVector(), HashMap(), null)
-                    sender.sendMessage(Message.MINING_CUBE_POS2.getMessage())
-                    return true
-                }
-
-                val world = miningArea.world
-                miningArea.world  = sender.location.world
-                miningArea.to = sender.location.toVector()
-                if (sender.location.world != world) {
-                    sender.sendMessage(Message.MINING_CUBE_POS2_WORLD_MISMATCH.getMessage())
-                } else {
-                    sender.sendMessage(Message.MINING_CUBE_POS2.getMessage())
-                }
-                return true
-            }
-            "setspawn" -> {
-                if (sender !is Player) {
-                    main.logger.severe("This command is for players only.")
-                    return true
-                }
-
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    sender.sendMessage(Message.MINING_CUBE_NO_AREA.getMessage())
-                    return true
-                }
-
-                miningArea.spawn = sender.location
-                sender.sendMessage(Message.MINING_CUBE_SET_SPAWN_SUCCESS.getMessage())
-                return true
-            }
-            "spawn" -> {
-                if (sender !is Player) {
-                    main.logger.severe("This command is for players only.")
-                    return true
-                }
-
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    sender.sendMessage(Message.MINING_CUBE_NO_AREA.getMessage())
-                    return true
-                }
-
-                val spawn = miningArea.spawn
-                if (spawn == null) {
-                    sender.sendMessage(Message.MINING_CUBE_SPAWN_UNSET.getMessage())
-                    return true
-                }
-
-                sender.sendMessage(Message.MINING_CUBE_SPAWN_SUCCESS.getMessage())
-                sender.teleport(spawn)
-                return true
-            }
-            "setchance" -> {
-                if (args.size < 3) {
-                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_SYNTAX.getMessage())
-                    return true
-                }
-
-                try {
-                    val mat = Material.valueOf(args[1].uppercase())
-                    val chance = args[2].toInt()
-                    if (chance < 0 || chance > 1000) {
-                        sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_NUMBER_OUT_OF_RANGE.getMessage())
-                        return true
-                    }
-                    val miningArea = main.dataManager.miningArea
-                    if (miningArea == null) {
-                        sender.sendMessage(Message.MINING_CUBE_NO_AREA.getMessage())
-                        return true
-                    }
-                    if (chance == 0) {
-                        miningArea.chances.remove(mat)
-                        sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_SUCCESS.getMessage()
-                            .replace("%mat", mat.toString().lowercase())
-                            .replace("%chance", chance.toString())
-                        )
-                        return true
-                    }
-                    miningArea.chances[mat] = chance
-                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_SUCCESS.getMessage()
-                        .replace("%mat", mat.toString().lowercase())
-                        .replace("%chance", chance.toString())
-                    )
-                    val sum = Util.getChanceSum(miningArea.chances.values)
-                    if (sum > 1000) {
-                        sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_WARNING.getMessage().replace("%sum", sum.toString()))
-                    }
-                    return true
-                } catch (e: IllegalArgumentException) {
-                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_INVALID_MATERIAL.getMessage()
-                        .replace("%mat", args[1]))
-                } catch (e: NumberFormatException) {
-                    sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_INVALID_NUMBER.getMessage()
-                        .replace("%number", args[2]))
-                }
-            }
-            "chances" -> {
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    sender.sendMessage(Message.MINING_CUBE_NO_AREA.getMessage())
-                    return true
-                }
-
-                if (miningArea.chances.isEmpty()) {
-                    sender.sendMessage(Message.MINING_CUBE_CHANCES_UNSET.getMessage())
-                    return true
-                }
-
-                val sj = StringJoiner("§8, §r")
-                miningArea.chances.forEach {
-                    sj.add(Message.MINING_CUBE_CHANCES_ENTRY.getFormatted()
-                        .replace("%mat", it.key.toString().lowercase())
-                        .replace("%chance", it.value.toString()))
-                }
-                sender.sendMessage(Message.MINING_CUBE_CHANCES.getMessage().replace("%entries", sj.toString()))
-                return true
-            }
-            "tp" -> {
-                if (sender !is Player) {
-                    main.logger.severe("This command is for players only.")
-                    return true
-                }
-
-                if (args.size < 2) {
-                    sender.sendMessage(Message.MINING_CUBE_TP_SYNTAX.getMessage())
-                    return true
-                }
-
-                val miningArea = main.dataManager.miningArea
-                if (miningArea == null) {
-                    sender.sendMessage(Message.MINING_CUBE_NO_AREA.getMessage())
-                    return true
-                }
-
-                if (args[1] == "pos1") {
-                    sender.teleport(miningArea.from.toLocation(miningArea.world))
-                    sender.sendMessage(Message.MINING_CUBE_TP_SUCCESS.getMessage().replace("%pos", "1"))
-                    return true
-                }
-
-                if (args[1] == "pos2") {
-                    sender.teleport(miningArea.to.toLocation(miningArea.world))
-                    sender.sendMessage(Message.MINING_CUBE_TP_SUCCESS.getMessage().replace("%pos", "2"))
-                    return true
-                }
-
-                sender.sendMessage(Message.MINING_CUBE_TP_POSITIONS.getMessage())
-                return true
-            }
-            "help" -> {
-                help(sender)
-                return true
-            }
-            else -> {
-                sender.sendMessage(Message.MINING_CUBE_UNKNOWN_COMMAND.getMessage())
-            }
+        when(args[0].lowercase()) {
+            "generate" -> GenerateSubcommand(sender, args).runTask(main)
+            "create" -> CreateSubcommand(sender, args).runTask(main)
+            "delete" -> DeleteSubcommand(sender, args).runTask(main)
+            "pos1" -> Pos1Subcommand(sender, args).runTask(main)
+            "pos2" -> Pos2Subcommand(sender, args).runTask(main)
+            "setspawn" -> SetSpawnSubcommand(sender, args).runTask(main)
+            "spawn" -> SpawnSubcommand(sender, args).runTask(main)
+            "setchance" -> SetChanceSubcommand(sender, args).runTask(main)
+            "chances" -> ChancesSubcommand(sender, args).runTask(main)
+            "tp" -> TpSubcommand(sender, args).runTask(main)
+            "list" -> ListSubcommand(sender, args).runTask(main)
+            "help" -> help(sender)
+            else -> sender.sendMessage(Message.MINING_CUBE_UNKNOWN_COMMAND.getMessage())
         }
         return true
     }
 
     private fun help(sender: CommandSender) {
         sender.sendMessage(Message.MINING_CUBE_HELP_GENERATE.getFormatted())
+        sender.sendMessage(Message.MINING_CUBE_HELP_CREATE.getFormatted())
+        sender.sendMessage(Message.MINING_CUBE_HELP_DELETE.getFormatted())
         sender.sendMessage(Message.MINING_CUBE_HELP_POS1.getFormatted())
         sender.sendMessage(Message.MINING_CUBE_HELP_POS2.getFormatted())
         sender.sendMessage(Message.MINING_CUBE_HELP_SET_SPAWN.getFormatted())
@@ -237,13 +233,18 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
         sender.sendMessage(Message.MINING_CUBE_HELP_SET_CHANCE.getFormatted())
         sender.sendMessage(Message.MINING_CUBE_HELP_CHANCES.getFormatted())
         sender.sendMessage(Message.MINING_CUBE_HELP_TP.getFormatted())
+        sender.sendMessage(Message.MINING_CUBE_HELP_LIST.getFormatted())
+        sender.sendMessage(Message.MINING_CUBE_HELP_HELP.getFormatted())
     }
 
-    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): MutableList<String>? {
+    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): MutableList<String> {
         val arguments = ArrayList<String>()
         val completions = ArrayList<String>()
 
         if (args.size == 1) {
+            arguments.add("generate")
+            arguments.add("create")
+            arguments.add("delete")
             arguments.add("generate")
             arguments.add("pos1")
             arguments.add("pos2")
@@ -252,6 +253,7 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
             arguments.add("setchance")
             arguments.add("chances")
             arguments.add("tp")
+            arguments.add("list")
             arguments.add("help")
 
             StringUtil.copyPartialMatches(args[0], arguments, completions)

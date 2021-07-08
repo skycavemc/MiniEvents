@@ -16,12 +16,14 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
 import java.lang.NullPointerException
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 import kotlin.collections.HashMap
 
 class DataManager(private val main: MiniEvents) {
 
-    var miningArea: MiningArea? = null
+    private val miningAreaList = ArrayList<MiningArea>()
     var lavaEventArea: LavaEventArea? = null
     private val path = main.dataFolder.path
 
@@ -30,77 +32,90 @@ class DataManager(private val main: MiniEvents) {
     }
 
     private fun readFromFile() {
-        val dir = File(path)
-        val miningCube = File(path, "miningCube.json")
-        if (!dir.exists() || !miningCube.exists()) {
+        val dir = File("$path/miningAreas")
+        if (!dir.exists() || dir.listFiles() == null || dir.listFiles()!!.isEmpty()) {
             return
         }
 
-        try {
-            val reader = FileReader(miningCube)
-            val parser = JSONParser()
-            val obj = parser.parse(reader) as JSONObject
+        val parser = JSONParser()
 
-            val fromObject = obj["from"] as JSONObject
-            val from = Vector(
-                (fromObject["x"] as Long).toDouble(),
-                (fromObject["y"] as Long).toDouble(),
-                (fromObject["z"] as Long).toDouble()
-            )
+        for (file in dir.listFiles()!!) {
+            try {
+                val reader = FileReader(file)
+                val obj = parser.parse(reader) as JSONObject
 
-            val toObject = obj["to"] as JSONObject
-            val to = Vector(
-                (toObject["x"] as Long).toDouble(),
-                (toObject["y"] as Long).toDouble(),
-                (toObject["z"] as Long).toDouble()
-            )
+                val uuid = UUID.fromString(obj["uuid"] as String)
+                val key = obj["key"] as String
 
-            val chancesArray = obj["chances"] as JSONArray
-            val chances = HashMap<Material, Int>()
-            chancesArray.forEach {
-                val chanceObj = it as JSONObject
-                val mat = Material.valueOf(chanceObj["material"] as String)
-                val chance = (chanceObj["chance"] as Long).toInt()
-                chances[mat] = chance
-            }
-
-            val spawnRawObject = obj["spawn"]
-            var spawn: Location? = null
-            if (spawnRawObject != null) {
-                val spawnObject = spawnRawObject as JSONObject
-                spawn = Location(
-                    Bukkit.getWorld(UUID.fromString(spawnObject["world"] as String))!!,
-                    spawnObject["x"] as Double,
-                    spawnObject["y"] as Double,
-                    spawnObject["z"] as Double,
-                    (spawnObject["yaw"] as Double).toFloat(),
-                    (spawnObject["pitch"] as Double).toFloat()
+                val fromObject = obj["from"] as JSONObject
+                val from = Vector(
+                    (fromObject["x"] as Long).toDouble(),
+                    (fromObject["y"] as Long).toDouble(),
+                    (fromObject["z"] as Long).toDouble()
                 )
-            }
 
-            miningArea = MiningArea(
-                Bukkit.getWorld(UUID.fromString(obj["world"] as String))!!,
-                from, to, chances, spawn
-            )
-        } catch (e: ParseException) {
-            e.printStackTrace()
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
+                val toObject = obj["to"] as JSONObject
+                val to = Vector(
+                    (toObject["x"] as Long).toDouble(),
+                    (toObject["y"] as Long).toDouble(),
+                    (toObject["z"] as Long).toDouble()
+                )
+
+                val chancesArray = obj["chances"] as JSONArray
+                val chances = HashMap<Material, Int>()
+                chancesArray.forEach {
+                    val chanceObj = it as JSONObject
+                    val mat = Material.valueOf(chanceObj["material"] as String)
+                    val chance = (chanceObj["chance"] as Long).toInt()
+                    chances[mat] = chance
+                }
+
+                val spawnRawObject = obj["spawn"]
+                var spawn: Location? = null
+                if (spawnRawObject != null) {
+                    val spawnObject = spawnRawObject as JSONObject
+                    spawn = Location(
+                        Bukkit.getWorld(UUID.fromString(spawnObject["world"] as String))!!,
+                        spawnObject["x"] as Double,
+                        spawnObject["y"] as Double,
+                        spawnObject["z"] as Double,
+                        (spawnObject["yaw"] as Double).toFloat(),
+                        (spawnObject["pitch"] as Double).toFloat()
+                    )
+                }
+
+                miningAreaList.add(MiningArea(uuid, key,
+                    Bukkit.getWorld(UUID.fromString(obj["world"] as String))!!,
+                    from, to, chances, spawn
+                ))
+            } catch (e: ParseException) {
+                e.printStackTrace()
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+            }
         }
     }
 
     fun writeToFile() {
-        val miningArea = this.miningArea ?: return
+        if (miningAreaList.isEmpty()) {
+            return
+        }
 
-        val dir = File(path)
+        for (entry in miningAreaList) {
+            writeToFile(entry)
+        }
+    }
+
+    private fun writeToFile(miningArea: MiningArea) {
+        val dir = File("$path/miningAreas")
         if (!dir.exists()) {
             dir.mkdirs()
         }
 
-        val miningCube = File(path, "miningCube.json")
-        if (!miningCube.exists()) {
+        val file = File("$path/miningAreas", "${miningArea.uuid}.json")
+        if (!file.exists()) {
             try {
-                miningCube.createNewFile()
+                file.createNewFile()
             } catch (e: IOException) {
                 e.printStackTrace()
                 return
@@ -108,7 +123,7 @@ class DataManager(private val main: MiniEvents) {
         }
 
         try {
-            val writer = FileWriter(miningCube)
+            val writer = FileWriter(file)
             val obj = JSONObject()
 
             val from = JSONObject()
@@ -143,6 +158,8 @@ class DataManager(private val main: MiniEvents) {
                 spawn["pitch"] = miningSpawn.pitch
             }
 
+            obj["uuid"] = miningArea.uuid.toString()
+            obj["key"] = miningArea.key
             obj["world"] = miningArea.world.uid.toString()
             obj["from"] = from
             obj["to"] = to
@@ -155,6 +172,50 @@ class DataManager(private val main: MiniEvents) {
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+
+    fun getMiningArea(uuid: UUID): MiningArea? {
+        return miningAreaList.firstOrNull { it.uuid == uuid }
+    }
+
+    fun getMiningArea(key: String): MiningArea? {
+        return miningAreaList.firstOrNull { it.key == key }
+    }
+
+    fun isKeyExisting(key: String): Boolean {
+        return miningAreaList.firstOrNull { it.key == key } != null
+    }
+
+    fun createMiningArea(key: String, firstLocation: Location) {
+        val miningArea = MiningArea(UUID.randomUUID(), key, firstLocation.world,
+            firstLocation.toVector(), firstLocation.toVector(),
+            HashMap(), null
+        )
+        miningAreaList.add(miningArea)
+        writeToFile(miningArea)
+    }
+
+    fun deleteMiningArea(miningArea: MiningArea) {
+        val dir = File("$path/miningAreas/deleted")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+
+        miningAreaList.remove(miningArea)
+
+        try {
+            Files.move(
+                Path.of("$path/miningAreas/${miningArea.uuid}.json"),
+                Path.of("$path/miningAreas/deleted/${miningArea.uuid}.json"),
+            )
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return
+        }
+    }
+
+    fun getMiningAreas(): List<MiningArea> {
+        return miningAreaList
     }
 
 }

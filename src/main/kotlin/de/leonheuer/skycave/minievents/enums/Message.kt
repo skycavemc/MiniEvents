@@ -8,21 +8,35 @@ enum class Message(private val message: String) {
 
 
     // mining cube general
-    MINING_CUBE_NO_AREA("&cBitte leg zuerst einen Mining-Bereich fest. Siehe /miningcube help"),
+    MINING_CUBE_UNKNOWN("&cDieser MiningCube ist unbekannt. Erstelle einen mit /miningcube create"),
     MINING_CUBE_UNKNOWN_COMMAND("&cUngültiger Befehl. Siehe /miningcube help"),
+    MINING_CUBE_AREA_NOT_GIVEN("&cBitte gib einen MiningCube an. Siehe /miningcube list"),
 
     // mining cube help
-    MINING_CUBE_HELP_GENERATE("&6/miningcube generate\n&8» &7Generiert den Mining-Würfel neu"),
-    MINING_CUBE_HELP_POS1("&6/miningcube pos1\n&8» &7Setzt die erste Position des Mining-Würfels"),
-    MINING_CUBE_HELP_POS2("&6/miningcube pos2\n&8» &7Setzt die zweite Position des Mining-Würfels"),
-    MINING_CUBE_HELP_SPAWN("&6/miningcube spawn\n&8» &7Teleportiert dich zum MiningCube Spawn"),
-    MINING_CUBE_HELP_SET_SPAWN("&6/miningcube setspawn\n&8» &7Setzt den Spawn für MiningCube"),
-    MINING_CUBE_HELP_SET_CHANCE("&6/miningcube setchance <material> <0-1000>\n&8» &7Setzt die Chance für ein Material"),
-    MINING_CUBE_HELP_CHANCES("&6/miningcube setchance <material> <0-1000>\n&8» &7Setzt die Chance für ein Material"),
-    MINING_CUBE_HELP_TP("&6/miningcube tp <pos1/pos2>\n&8» &7Teleportiert dich zur angegebenen Position"),
+    MINING_CUBE_HELP_GENERATE("&6/miningcube generate <name>\n&8» &7Generiert den MiningCube neu"),
+    MINING_CUBE_HELP_CREATE("&6/miningcube create <name>\n&8» &7Erstellt einen MiningCube bei deiner Position"),
+    MINING_CUBE_HELP_DELETE("&6/miningcube delete <name>\n&8» &7Entfernt den MiningCube"),
+    MINING_CUBE_HELP_POS1("&6/miningcube pos1 <name>\n&8» &7Setzt die erste Position des MiningCube"),
+    MINING_CUBE_HELP_POS2("&6/miningcube pos2 <name>\n&8» &7Setzt die zweite Position des MiningCube"),
+    MINING_CUBE_HELP_SPAWN("&6/miningcube spawn <name>\n&8» &7Teleportiert dich zum MiningCube Spawn"),
+    MINING_CUBE_HELP_SET_SPAWN("&6/miningcube setspawn <name>\n&8» &7Setzt den Spawn für den MiningCube"),
+    MINING_CUBE_HELP_SET_CHANCE("&6/miningcube setchance <name> <material> <0-1000>\n&8» &7Setzt die Chance für ein Material"),
+    MINING_CUBE_HELP_CHANCES("&6/miningcube chances <name>\n&8» &7Zeigt die Chancen eines MiningCubes an"),
+    MINING_CUBE_HELP_TP("&6/miningcube tp <name> <pos1/pos2>\n&8» &7Teleportiert dich zur angegebenen Position"),
+    MINING_CUBE_HELP_LIST("&6/miningcube list\n&8» &7Zeigt die Liste der MiningCubes"),
+    MINING_CUBE_HELP_HELP("&6/miningcube help\n&8» &7Zeigt Hilfe an"),
 
     // mining cube generate command
     MINING_CUBE_GENERATE_PROCESS("&aGeneriere Mining-Würfel..."),
+
+    // mining cube create command
+    MINING_CUBE_CREATE_SYNTAX("&c/miningcube create <Name>"),
+    MINING_CUBE_CREATE_EXISTS("&cEin MiningCube mit dem Name %name existiert bereits."),
+    MINING_CUBE_CREATE_SUCCESS("&7MiningCube &a%name &7erfolgreich bei &adeiner Position &7erstellt."),
+    MINING_CUBE_CREATE_SPAWN("&eVergiss nicht das Setzen von Position 1, Position 2 und einem Spawn!"),
+
+    // mining cube delete command
+    MINING_CUBE_DELETE_SUCCESS("&cMiningCube %name erfolgreich entfernt."),
 
     // mining cube pos1 command
     MINING_CUBE_POS1("&aPosition 1 erfolgreich geändert."),
@@ -40,7 +54,7 @@ enum class Message(private val message: String) {
     MINING_CUBE_SPAWN_UNSET("&cDer Spawn wurde noch nicht festgelegt."),
 
     // mining cube set chance command
-    MINING_CUBE_SET_CHANCE_SYNTAX("&c/miningcube setchance <Material> <0-1000>"),
+    MINING_CUBE_SET_CHANCE_SYNTAX("&c/miningcube setchance <Name> <Material> <0-1000>"),
     MINING_CUBE_SET_CHANCE_INVALID_MATERIAL("&c%mat ist kein gültiges Material. Tipp: Nutze die Tab-Vervollständigung!"),
     MINING_CUBE_SET_CHANCE_INVALID_NUMBER("&c%number ist keine gültige Zahl."),
     MINING_CUBE_SET_CHANCE_NUMBER_OUT_OF_RANGE("&cBitte gib eine Zahl zwischen 0 und 1000 an."),
@@ -53,9 +67,13 @@ enum class Message(private val message: String) {
     MINING_CUBE_CHANCES_UNSET("&cBisher wurden noch keine Wahrscheinlichkeiten festgelegt."),
 
     // mining cube tp command
-    MINING_CUBE_TP_SYNTAX("&c/miningcube tp <pos1/pos2>"),
+    MINING_CUBE_TP_SYNTAX("&c/miningcube tp <Name> <pos1/pos2>"),
     MINING_CUBE_TP_SUCCESS("&aTeleportiere zur Position %pos..."),
     MINING_CUBE_TP_POSITIONS("&cBitte gib pos1 oder pos2 ein."),
+
+    // mining cube list command
+    MINING_CUBE_LIST_NONE("&cEs existieren keine MiningCubes."),
+    MINING_CUBE_LIST("&aListe der MiningCubes: &7%list"),
 
 
     // lava event messages
