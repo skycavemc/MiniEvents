@@ -58,11 +58,14 @@ object Util {
     fun canGenerate(block: Block, source: Block, face: BlockFace?): Boolean {
         val liquid = source.type
         return when (block.type) {
+            // lava flows into water
             Material.WATER -> liquid == Material.LAVA
             Material.AIR, Material.CAVE_AIR, Material.VOID_AIR -> {
                 if (liquid == Material.LAVA) {
                     return when (face) {
+                        // lava flows into air and has water in front, left or right
                         BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST -> hasWater(block, face)
+                        // lava flows down and has water around it
                         BlockFace.DOWN -> hasWaterAround(block)
                         else -> false
                     }

@@ -13,18 +13,26 @@ class CobbleGenerationListener(private val main: MiniEvents): Listener {
         val source = event.block
         val liquid = source.type
         val block = event.toBlock
-        if (source !== block) {
-            if (block.type != liquid) {
-                if (Util.canGenerate(block, source, event.face)) {
-                    event.isCancelled = true
-                    Util.playCobbleGenerationEffect(block)
-                    if (main.boosterManager.isRunning) {
-                        block.type = Util.generateOreBlock(main.boosterManager.multiplier)
-                    } else {
-                        block.type = Util.generateOreBlock()
-                    }
-                }
-            }
+
+        // no flow at all
+        if (source == block) {
+            return
+        }
+        // flows into another liquid
+        if (block.type == liquid) {
+            return
+        }
+        // check if cobblestone could possibly be generated
+        if (!Util.canGenerate(block, source, event.face)) {
+            return
+        }
+
+        event.isCancelled = true
+        Util.playCobbleGenerationEffect(block)
+        if (main.boosterManager.isRunning) {
+            block.type = Util.generateOreBlock(main.boosterManager.multiplier)
+        } else {
+            block.type = Util.generateOreBlock()
         }
     }
 

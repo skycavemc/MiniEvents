@@ -8,7 +8,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 import java.util.*
 
@@ -137,7 +136,7 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
                 sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_INVALID_MATERIAL.getMessage()
                     .replace("%mat", args[1]))
             } catch (e: NumberFormatException) {
-                sender.sendMessage(Message.MINING_CUBE_SET_CHANCE_INVALID_NUMBER.getMessage()
+                sender.sendMessage(Message.INVALID_NUMBER.getMessage()
                     .replace("%number", args[2]))
             }
         }
@@ -257,16 +256,25 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
             arguments.add("help")
 
             StringUtil.copyPartialMatches(args[0], arguments, completions)
-        } else if (args.size == 2) {
+        }
+
+        if (args.size == 2) {
+            if (args[0] != "list" && args[0] != "help") {
+                main.dataManager.getMiningAreas().forEach { arguments.add(it.key) }
+                StringUtil.copyPartialMatches(args[1], arguments, completions)
+            }
+        }
+
+        if (args.size == 3) {
             when (args[0]) {
                 "setchance" -> {
                     Material.values().forEach { arguments.add(it.toString().lowercase()) }
-                    StringUtil.copyPartialMatches(args[1], arguments, completions)
+                    StringUtil.copyPartialMatches(args[2], arguments, completions)
                 }
                 "tp" -> {
                     arguments.add("pos1")
                     arguments.add("pos2")
-                    StringUtil.copyPartialMatches(args[1], arguments, completions)
+                    StringUtil.copyPartialMatches(args[2], arguments, completions)
                 }
             }
         }
