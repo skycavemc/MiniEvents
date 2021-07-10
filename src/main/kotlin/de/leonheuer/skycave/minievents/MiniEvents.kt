@@ -29,7 +29,7 @@ class MiniEvents: JavaPlugin() {
         boosterManager = BoosterManager(this)
 
         getCommand("miningcube")!!.setExecutor(MiningCubeCommand(this))
-        getCommand("lavaevent")!!.setExecutor(LavaEventCommand())
+        getCommand("lavaevent")!!.setExecutor(LavaEventCommand(this))
         getCommand("erze")!!.setExecutor(ErzeCommand(this))
         getCommand("booster")!!.setExecutor(BoosterCommand(this))
 
