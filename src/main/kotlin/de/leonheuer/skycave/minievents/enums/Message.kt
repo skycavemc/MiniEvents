@@ -4,7 +4,10 @@ import org.bukkit.ChatColor
 
 enum class Message(private val message: String) {
 
+    // global
     PREFIX("&e&l| &6Event &8» "),
+    NO_PERMS("&cDu hast keine Rechte für diesen Befehl."),
+    INVALID_NUMBER("&c%number ist keine gültige Zahl."),
 
 
     // mining cube general
@@ -56,7 +59,6 @@ enum class Message(private val message: String) {
     // mining cube set chance command
     MINING_CUBE_SET_CHANCE_SYNTAX("&c/miningcube setchance <Name> <Material> <0-1000>"),
     MINING_CUBE_SET_CHANCE_INVALID_MATERIAL("&c%mat ist kein gültiges Material. Tipp: Nutze die Tab-Vervollständigung!"),
-    MINING_CUBE_SET_CHANCE_INVALID_NUMBER("&c%number ist keine gültige Zahl."),
     MINING_CUBE_SET_CHANCE_NUMBER_OUT_OF_RANGE("&cBitte gib eine Zahl zwischen 0 und 1000 an."),
     MINING_CUBE_SET_CHANCE_SUCCESS("&7Chance für &a%mat &7auf &a%chance &7gesetzt."),
     MINING_CUBE_SET_CHANCE_WARNING("&eAchtung: Die Chancen ergeben zusammen über 1000. (%sum)"),
@@ -74,11 +76,6 @@ enum class Message(private val message: String) {
     // mining cube list command
     MINING_CUBE_LIST_NONE("&cEs existieren keine MiningCubes."),
     MINING_CUBE_LIST("&aListe der MiningCubes: &7%list"),
-
-
-    // lava event messages
-    LAVA_EVENT_OUT("&c%player ist ausgeschieden."),
-    LAVA_EVENT_OUT_SELF("&cDu bist ausgeschieden."),
 
 
     // erze command
@@ -113,6 +110,42 @@ enum class Message(private val message: String) {
 
     // booster boss bar
     BOOSTER_BOSS_BAR("&3&lErzeBoost &e&laktiv! &c&lDauer: &c%durance"),
+
+
+    // lava event general
+    LAVA_EVENT_OUT("&c%player ist ausgeschieden."),
+    LAVA_EVENT_OUT_SELF("&cDu bist ausgeschieden und betrittst nun den Zuschauermodus. /lavaevent leave zum Verlassen."),
+    LAVA_EVENT_JOIN("&a%player &7ist dem LavaEvent beigetreten."),
+    LAVA_EVENT_JOIN_SELF("&7Du bist dem LavaEvent beigetreten."),
+    LAVA_EVENT_LEAVE_SELF("&cDu hast den %mode verlassen."),
+    LAVA_EVENT_NOT_RUNNING("&cDerzeit läuft kein Lava Event."),
+    LAVA_EVENT_RUNNING("&cDas Lava Event hat schon begonnen."),
+    LAVA_EVENT_FINISHED("&cDas Lava Event ist bereits vorbei."),
+    LAVA_EVENT_NOT_IN("&cDu nimmst nicht am LavaEvent teil."),
+
+    // lava event help
+    LAVA_EVENT_HELP_JOIN("&e/lavaevent join\n&8» &7Tritt dem laufenden LavaEvent bei"),
+    LAVA_EVENT_HELP_LEAVE("&e/lavaevent leave\n&8» &7Verlässt die Wartephase oder den Zuschauermodus"),
+    LAVA_EVENT_HELP_START("&e/lavaevent start <schwierigkeit>\n&8» &7Startet das LavaEvent mit der angegebenen Schwierigkeit"),
+    LAVA_EVENT_HELP_STOP("&e/lavaevent stop\n&8» &7Stoppt ein laufendes LavaEvent"),
+    LAVA_EVENT_HELP_SET_SPAWN("&e/lavaevent setspawn\n&8» &7Legt den Beitrittsort fest"),
+    LAVA_EVENT_HELP_SET_SPECTATE("&e/lavaevent setspectate\n&8» &7Legt den Zuschauerort fest"),
+    LAVA_EVENT_HELP_SET_RADIUS("&e/lavaevent join\n&8» &7Setzt den Radius der Spielfläche"),
+    LAVA_EVENT_HELP_SET_MATERIAL("&e/lavaevent setmaterial <floor/lava> <material>\n" +
+            "&8» &7Setzt das Material für den angegebenen Platzhalter"),
+    LAVA_EVENT_HELP_INFO("&e/lavaevent info\n&8» &7Liefert Informationen über das LavaEvent"),
+
+    // lava event set spawn command
+    LAVA_EVENT_SET_SPAWN_SUCCESS("&aDu hast erfolgreich den Beitrittsort gesetzt."),
+
+    // lava event set spectate command
+    LAVA_EVENT_SET_SPECTATE_SUCCESS("&aDu hast erfolgreich den Zuschauerort gesetzt."),
+
+    // lava event set radius command
+    LAVA_EVENT_SET_RADIUS_SUCCESS("&aDer Radius wurde auf %radius gesetzt."),
+
+    // lava event set material command
+    LAVA_EVENT_SET_MATERIAL_SUCCESS("&aDu hast erfolgreich den Beitrittsort gesetzt."),
     ;
 
     fun getFormatted(): String {

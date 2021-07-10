@@ -30,11 +30,13 @@ class LavaEventManager {
     }
 
     fun getPlayerList(state: PlayerState): List<OfflinePlayer> {
-        return participantHashMap.keys.filter { participantHashMap[it] == state }.map { Bukkit.getOfflinePlayer(it) }.toList()
+        return participantHashMap.keys.filter { participantHashMap[it] == state }
+            .map { Bukkit.getOfflinePlayer(it) }.toList()
     }
 
     fun getPlayerList(): List<OfflinePlayer> {
-        return participantHashMap.keys.map { Bukkit.getOfflinePlayer(it) }.toList()
+        return participantHashMap.keys
+            .map { Bukkit.getOfflinePlayer(it) }.toList()
     }
 
 }

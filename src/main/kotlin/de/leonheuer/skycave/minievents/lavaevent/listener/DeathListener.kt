@@ -47,7 +47,7 @@ class DeathListener(private val main: MiniEvents): Listener {
             if (area == null) {
                 player.gameMode = GameMode.SPECTATOR
             } else {
-                player.teleport(area.spectate)
+                player.teleport(area.spectate!!)
             }
         }
     }

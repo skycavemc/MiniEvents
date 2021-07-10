@@ -1,6 +1,7 @@
 package de.leonheuer.skycave.minievents.manager
 
 import de.leonheuer.skycave.minievents.MiniEvents
+import de.leonheuer.skycave.minievents.lavaevent.enums.EventMaterial
 import de.leonheuer.skycave.minievents.lavaevent.model.LavaEventArea
 import de.leonheuer.skycave.minievents.miningcube.model.MiningArea
 import org.bukkit.Bukkit
@@ -24,7 +25,7 @@ import kotlin.collections.HashMap
 class DataManager(private val main: MiniEvents) {
 
     private val miningAreaList = ArrayList<MiningArea>()
-    var lavaEventArea: LavaEventArea? = null
+    var lavaEventArea = LavaEventArea(null, null, 0, EnumMap(EventMaterial::class.java))
     private val path = main.dataFolder.path
 
     init {

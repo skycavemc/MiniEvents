@@ -10,7 +10,7 @@ commands:
   miningcube:
     permission: skybee.minievent.miningcube
   lavaevent:
-    permission: skybee.minievent.lavaevent
+    description: lavaevent command
   erze:
     aliases: ["erz", "ores", "ore"]
   booster:
