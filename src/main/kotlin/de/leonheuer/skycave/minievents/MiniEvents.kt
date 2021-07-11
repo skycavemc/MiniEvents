@@ -25,16 +25,16 @@ class MiniEvents: JavaPlugin() {
     @Suppress("Deprecation")
     override fun onEnable() {
         dataManager = DataManager(this)
-        lavaEventManager = LavaEventManager()
+        //lavaEventManager = LavaEventManager()
         boosterManager = BoosterManager(this)
 
         getCommand("miningcube")!!.setExecutor(MiningCubeCommand(this))
-        getCommand("lavaevent")!!.setExecutor(LavaEventCommand(this))
+        //getCommand("lavaevent")!!.setExecutor(LavaEventCommand(this))
         getCommand("erze")!!.setExecutor(ErzeCommand(this))
         getCommand("booster")!!.setExecutor(BoosterCommand(this))
 
         val pm = Bukkit.getPluginManager()
-        pm.registerEvents(DeathListener(this), this)
+        //pm.registerEvents(DeathListener(this), this)
         pm.registerEvents(CobbleGenerationListener(this), this)
         pm.registerEvents(PlayerJoinListener(this), this)
 

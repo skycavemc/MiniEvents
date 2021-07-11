@@ -44,11 +44,7 @@ class DeathListener(private val main: MiniEvents): Listener {
                     .replace("%player", player.name)) }
             player.sendMessage(Message.LAVA_EVENT_OUT_SELF.getMessage())
             val area = main.dataManager.lavaEventArea
-            if (area == null) {
-                player.gameMode = GameMode.SPECTATOR
-            } else {
-                player.teleport(area.spectate!!)
-            }
+            player.teleport(area.spectate!!)
         }
     }
 

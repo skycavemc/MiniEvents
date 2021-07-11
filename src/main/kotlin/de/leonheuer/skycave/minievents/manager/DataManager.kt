@@ -41,58 +41,60 @@ class DataManager(private val main: MiniEvents) {
         val parser = JSONParser()
 
         for (file in dir.listFiles()!!) {
-            try {
-                val reader = FileReader(file)
-                val obj = parser.parse(reader) as JSONObject
+            if (file.isFile) {
+                try {
+                    val reader = FileReader(file)
+                    val obj = parser.parse(reader) as JSONObject
 
-                val uuid = UUID.fromString(obj["uuid"] as String)
-                val key = obj["key"] as String
+                    val uuid = UUID.fromString(obj["uuid"] as String)
+                    val key = obj["key"] as String
 
-                val fromObject = obj["from"] as JSONObject
-                val from = Vector(
-                    (fromObject["x"] as Long).toDouble(),
-                    (fromObject["y"] as Long).toDouble(),
-                    (fromObject["z"] as Long).toDouble()
-                )
-
-                val toObject = obj["to"] as JSONObject
-                val to = Vector(
-                    (toObject["x"] as Long).toDouble(),
-                    (toObject["y"] as Long).toDouble(),
-                    (toObject["z"] as Long).toDouble()
-                )
-
-                val chancesArray = obj["chances"] as JSONArray
-                val chances = HashMap<Material, Int>()
-                chancesArray.forEach {
-                    val chanceObj = it as JSONObject
-                    val mat = Material.valueOf(chanceObj["material"] as String)
-                    val chance = (chanceObj["chance"] as Long).toInt()
-                    chances[mat] = chance
-                }
-
-                val spawnRawObject = obj["spawn"]
-                var spawn: Location? = null
-                if (spawnRawObject != null) {
-                    val spawnObject = spawnRawObject as JSONObject
-                    spawn = Location(
-                        Bukkit.getWorld(UUID.fromString(spawnObject["world"] as String))!!,
-                        spawnObject["x"] as Double,
-                        spawnObject["y"] as Double,
-                        spawnObject["z"] as Double,
-                        (spawnObject["yaw"] as Double).toFloat(),
-                        (spawnObject["pitch"] as Double).toFloat()
+                    val fromObject = obj["from"] as JSONObject
+                    val from = Vector(
+                        (fromObject["x"] as Long).toDouble(),
+                        (fromObject["y"] as Long).toDouble(),
+                        (fromObject["z"] as Long).toDouble()
                     )
-                }
 
-                miningAreaList.add(MiningArea(uuid, key,
-                    Bukkit.getWorld(UUID.fromString(obj["world"] as String))!!,
-                    from, to, chances, spawn
-                ))
-            } catch (e: ParseException) {
-                e.printStackTrace()
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
+                    val toObject = obj["to"] as JSONObject
+                    val to = Vector(
+                        (toObject["x"] as Long).toDouble(),
+                        (toObject["y"] as Long).toDouble(),
+                        (toObject["z"] as Long).toDouble()
+                    )
+
+                    val chancesArray = obj["chances"] as JSONArray
+                    val chances = HashMap<Material, Int>()
+                    chancesArray.forEach {
+                        val chanceObj = it as JSONObject
+                        val mat = Material.valueOf(chanceObj["material"] as String)
+                        val chance = (chanceObj["chance"] as Long).toInt()
+                        chances[mat] = chance
+                    }
+
+                    val spawnRawObject = obj["spawn"]
+                    var spawn: Location? = null
+                    if (spawnRawObject != null) {
+                        val spawnObject = spawnRawObject as JSONObject
+                        spawn = Location(
+                            Bukkit.getWorld(UUID.fromString(spawnObject["world"] as String))!!,
+                            spawnObject["x"] as Double,
+                            spawnObject["y"] as Double,
+                            spawnObject["z"] as Double,
+                            (spawnObject["yaw"] as Double).toFloat(),
+                            (spawnObject["pitch"] as Double).toFloat()
+                        )
+                    }
+
+                    miningAreaList.add(MiningArea(uuid, key,
+                        Bukkit.getWorld(UUID.fromString(obj["world"] as String))!!,
+                        from, to, chances, spawn
+                    ))
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                } catch (e: NullPointerException) {
+                    e.printStackTrace()
+                }
             }
         }
     }
