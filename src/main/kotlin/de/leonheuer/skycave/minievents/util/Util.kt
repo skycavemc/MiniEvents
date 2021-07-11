@@ -28,11 +28,10 @@ object Util {
     }
 
     private fun getRandomMaterialFromHashMap(hashMap: HashMap<Material, Int>): Material {
-        val random = Random.nextInt(1000)
-        var i = 0
+        var random = Random.nextInt(1000)
         for (entry in hashMap) {
-            i += entry.value
-            if (i < random) {
+            random -= entry.value
+            if (random < 0) {
                 return entry.key
             }
         }
@@ -114,7 +113,8 @@ object Util {
     fun generateOreBlock(): Material {
         var rnd: Int = Random.nextInt(1000)
         for (result in OreResult.values()) {
-            if (result.chance.let { rnd -= it; rnd } < 0) return result.material
+            rnd -= result.chance
+            if (rnd < 0) return result.material
         }
         return Material.COBBLESTONE
     }
@@ -122,7 +122,10 @@ object Util {
     fun generateOreBlock(multiplier: Int): Material {
         var rnd: Int = Random.nextInt(1000)
         for (result in OreResult.values()) {
-            if (result.canBeBoosted && result.chance * multiplier.let { rnd -= it; rnd } < 0) return result.material
+            if (result.canBeBoosted) {
+                rnd -= result.chance * multiplier
+                if (rnd < 0) return result.material
+            }
         }
         return Material.COBBLESTONE
     }
@@ -164,13 +167,14 @@ object Util {
         }
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(main, {
+            main.boosterManager.start(seconds, multiplier)
+
             Bukkit.broadcastMessage("")
             Bukkit.broadcastMessage(Message.BOOSTER_START.getMessage()
                     .replace("%durance", main.boosterManager.getDurance())
                     .replace("%multiplier", main.boosterManager.multiplier.toString()))
             Bukkit.broadcastMessage("")
 
-            main.boosterManager.start(seconds, multiplier)
             playSoundToAll(Sound.BLOCK_NOTE_BLOCK_PLING)
         }, delay)
     }

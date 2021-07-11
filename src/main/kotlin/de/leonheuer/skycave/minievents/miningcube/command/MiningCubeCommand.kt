@@ -165,13 +165,13 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
         sender, args, true, 3, true, Message.MINING_CUBE_TP_SYNTAX
     ) {
         override fun execute() {
-            if (args[1] == "pos1") {
+            if (args[2] == "pos1") {
                 player.teleport(miningArea.from.toLocation(miningArea.world))
                 player.sendMessage(Message.MINING_CUBE_TP_SUCCESS.getMessage().replace("%pos", "1"))
                 return
             }
 
-            if (args[1] == "pos2") {
+            if (args[2] == "pos2") {
                 player.teleport(miningArea.to.toLocation(miningArea.world))
                 player.sendMessage(Message.MINING_CUBE_TP_SUCCESS.getMessage().replace("%pos", "2"))
                 return
