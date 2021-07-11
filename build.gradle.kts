@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "de.leonheuer.skycave.minievents"
-version = "1.3.0-pre"
+version = "1.3.1-pre"
 
 repositories {
     mavenCentral()

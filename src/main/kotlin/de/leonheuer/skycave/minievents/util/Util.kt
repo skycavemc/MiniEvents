@@ -153,13 +153,13 @@ object Util {
 
     @Suppress("Deprecation")
     fun initiateBoosterCountdown(seconds: Int, multiplier: Int) {
-        Bukkit.broadcastMessage(Message.BOOSTER_COUNTDOWN.getMessage().replace("%sec", "10"))
+        Bukkit.broadcastMessage(Message.BOOSTER_COUNTDOWN.getFormatted().replace("%sec", "10"))
         playSoundToAll(Sound.BLOCK_NOTE_BLOCK_BASS)
 
         var delay = 140L
         for (i in 3 downTo 1) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(main, {
-                Bukkit.broadcastMessage(Message.BOOSTER_COUNTDOWN.getMessage()
+                Bukkit.broadcastMessage(Message.BOOSTER_COUNTDOWN.getFormatted()
                     .replace("%sec", i.toString()))
                 playSoundToAll(Sound.BLOCK_NOTE_BLOCK_BASS)
             }, delay)
@@ -170,7 +170,7 @@ object Util {
             main.boosterManager.start(seconds, multiplier)
 
             Bukkit.broadcastMessage("")
-            Bukkit.broadcastMessage(Message.BOOSTER_START.getMessage()
+            Bukkit.broadcastMessage(Message.BOOSTER_START.getFormatted()
                     .replace("%durance", main.boosterManager.getDurance())
                     .replace("%multiplier", main.boosterManager.multiplier.toString()))
             Bukkit.broadcastMessage("")
