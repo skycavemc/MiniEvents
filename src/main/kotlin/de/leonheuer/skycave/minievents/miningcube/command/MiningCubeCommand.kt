@@ -2,7 +2,6 @@ package de.leonheuer.skycave.minievents.miningcube.command
 
 import de.leonheuer.skycave.minievents.MiniEvents
 import de.leonheuer.skycave.minievents.enums.Message
-import de.leonheuer.skycave.minievents.util.BlockGenerator
 import de.leonheuer.skycave.minievents.util.Util
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -19,9 +18,12 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
     ) {
         override fun execute() {
             sender.sendMessage(Message.MINING_CUBE_GENERATE_BEGIN.getMessage().replace("%name", miningArea.key))
-            val generator = BlockGenerator(miningArea)
-            generator.setInitiator(sender)
-            generator.runTaskAsynchronously(main)
+            val start = System.currentTimeMillis()
+            Util.generateCuboidBlockArea(miningArea)
+            val end = System.currentTimeMillis()
+            sender.sendMessage(Message.MINING_CUBE_GENERATE_FINISH.getMessage()
+                .replace("%name", miningArea.key)
+                .replace("%time", "${end - start}ms"))
         }
     }
 
