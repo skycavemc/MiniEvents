@@ -30,7 +30,8 @@ enum class Message(private val message: String) {
     MINING_CUBE_HELP_HELP("&6/miningcube help\n&8» &7Zeigt Hilfe an"),
 
     // mining cube generate command
-    MINING_CUBE_GENERATE_PROCESS("&aGeneriere Mining-Würfel..."),
+    MINING_CUBE_GENERATE_BEGIN("&7Asynchrone Generation des Bereiches %name gestartet."),
+    MINING_CUBE_GENERATE_FINISH("&aGeneration des Bereiches %name abgeschlossen, benötigte Zeit: %time"),
 
     // mining cube create command
     MINING_CUBE_CREATE_SYNTAX("&c/miningcube create <Name>"),

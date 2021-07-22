@@ -8,26 +8,14 @@ import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitRunnable
 import kotlin.random.Random
 
 object Util {
 
     private val main = JavaPlugin.getPlugin(MiniEvents::class.java)
 
-    fun generateCuboidBlockArea(miningArea: MiningArea) {
-        val from = miningArea.from
-        val to = miningArea.to
-        for (x in getIntRange(from.blockX, to.blockX)) {
-            for (y in getIntRange(from.blockY, to.blockY)) {
-                for (z in getIntRange(from.blockZ, to.blockZ)) {
-                    val pos = Location(miningArea.world, x.toDouble(), y.toDouble(), z.toDouble())
-                    pos.block.type = getRandomMaterialFromHashMap(miningArea.chances)
-                }
-            }
-        }
-    }
-
-    private fun getRandomMaterialFromHashMap(hashMap: HashMap<Material, Int>): Material {
+    fun getRandomMaterialFromHashMap(hashMap: HashMap<Material, Int>): Material {
         var random = Random.nextInt(1000)
         for (entry in hashMap) {
             random -= entry.value
@@ -44,7 +32,7 @@ object Util {
         return result
     }
 
-    private fun getIntRange(first: Int, second: Int): IntRange {
+    fun getIntRange(first: Int, second: Int): IntRange {
         if (first < second) {
             return first..second
         }
