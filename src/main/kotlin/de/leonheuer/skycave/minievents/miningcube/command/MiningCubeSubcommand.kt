@@ -23,11 +23,13 @@ abstract class MiningCubeSubcommand(
     protected lateinit var player: Player
 
     override fun run() {
-        if (playerOnly && sender !is Player) {
-            sender.sendMessage("&cThis command is for players only.")
-            return
+        if (playerOnly) {
+            if (sender !is Player) {
+                sender.sendMessage("&cThis command is for players only.")
+                return
+            }
+            player = sender
         }
-        player = sender as Player
         if (requiredArgs > 1 && args.size < requiredArgs) {
             sender.sendMessage(message.getMessage())
             return
