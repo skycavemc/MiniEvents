@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.20"
+    kotlin("jvm") version "1.6.10"
 }
 
 group = "de.leonheuer.skycave.minievents"
-version = "1.3.2-pre"
+version = "1.3.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -13,17 +13,21 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.0")
+    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
 }
 
-
+val javaVersion = "17"
 tasks {
     test {
         useJUnit()
     }
 
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = javaVersion
     }
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
