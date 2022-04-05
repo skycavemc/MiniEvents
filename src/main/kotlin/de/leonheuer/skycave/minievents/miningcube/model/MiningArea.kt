@@ -13,6 +13,6 @@ data class MiningArea(
     var world: World,
     var from: Vector,
     var to: Vector,
-    var chances: HashMap<Material, Int>,
+    var chances: EnumMap<Material, Int>,
     var spawn: Location?
     )

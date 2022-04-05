@@ -65,7 +65,7 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                         val state = main.lavaEventManager.getState(sender)
                         if (state == null || state == PlayerState.OUT) {
                             main.lavaEventManager.setState(sender, PlayerState.WAITING)
-                            Bukkit.getOnlinePlayers().filter { it != sender}.forEach {
+                            Bukkit.getOnlinePlayers().filter { it != sender }.forEach {
                                 it.sendMessage(Message.LAVA_EVENT_JOIN.getMessage()
                                     .replace("%player", sender.name))
                             }
@@ -112,16 +112,8 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                             }
                         }
                     }
-                    LavaEventState.OPEN -> {
-                        if (state == PlayerState.OUT) {
-                            main.lavaEventManager.setState(sender, PlayerState.WAITING)
-                            Bukkit.getOnlinePlayers().filter { it != sender}.forEach {
-                                it.sendMessage(Message.LAVA_EVENT_JOIN.getMessage()
-                                    .replace("%player", sender.name))
-                            }
-                            sender.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
-                            sender.teleport(main.dataManager.lavaEventArea.spawn!!)
-                        }
+                    else -> {
+
                     }
                 }
             }
