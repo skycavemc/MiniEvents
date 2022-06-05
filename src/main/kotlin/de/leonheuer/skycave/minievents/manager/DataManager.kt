@@ -64,7 +64,7 @@ class DataManager(private val main: MiniEvents) {
                     )
 
                     val chancesArray = obj["chances"] as JSONArray
-                    val chances = HashMap<Material, Int>()
+                    val chances = EnumMap<Material, Int>(Material::class.java)
                     chancesArray.forEach {
                         val chanceObj = it as JSONObject
                         val mat = Material.valueOf(chanceObj["material"] as String)
@@ -192,7 +192,7 @@ class DataManager(private val main: MiniEvents) {
     fun createMiningArea(key: String, firstLocation: Location) {
         val miningArea = MiningArea(UUID.randomUUID(), key, firstLocation.world,
             firstLocation.toVector(), firstLocation.toVector(),
-            HashMap(), null
+            EnumMap(Material::class.java), null
         )
         miningAreaList.add(miningArea)
         writeToFile(miningArea)
