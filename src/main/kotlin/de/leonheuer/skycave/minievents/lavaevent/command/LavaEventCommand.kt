@@ -13,38 +13,6 @@ import org.bukkit.entity.Player
 
 class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabCompleter {
 
-    private class SetSpawnCommand(sender: CommandSender, args: Array<out String>) : LavaEventSubCommand(
-        sender, args, true, "skybee.minievent.lavaevent.setspawn"
-    ) {
-        override fun execute() {
-            main.dataManager.lavaEventArea.spawn = player.location
-            player.sendMessage(Message.LAVA_EVENT_SET_SPAWN_SUCCESS.getMessage())
-        }
-    }
-
-    private class SetSpectateCommand(sender: CommandSender, args: Array<out String>) : LavaEventSubCommand(
-        sender, args, true, "skybee.minievent.lavaevent.setspawn"
-    ) {
-        override fun execute() {
-            main.dataManager.lavaEventArea.spectate = player.location
-            player.sendMessage(Message.LAVA_EVENT_SET_SPECTATE_SUCCESS.getMessage())
-        }
-    }
-
-    private class SetRadiusCommand(sender: CommandSender, args: Array<out String>) : LavaEventSubCommand(
-        sender, args, true, "skybee.minievent.lavaevent.setspawn"
-    ) {
-        override fun execute() {
-            try {
-                main.dataManager.lavaEventArea.radius = args[1].toInt()
-                player.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage())
-            } catch (e: NumberFormatException) {
-                sender.sendMessage(Message.INVALID_NUMBER.getMessage()
-                    .replace("%number", args[1]))
-            }
-        }
-    }
-
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
             help(sender)
@@ -53,75 +21,66 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
 
         when (args[0].lowercase()) {
             "join" -> {
-                if (sender !is Player) {
-                    sender.sendMessage("§cThis command is for players only.")
+                if (!checkConditions(true, null, sender)) return true
+                val player = sender as Player
+
+                val lavaEvent = main.lavaEvent
+                if (lavaEvent == null) {
+                    player.sendMessage(Message.LAVA_EVENT_NOT_RUNNING.getMessage())
                     return true
                 }
-                when (main.lavaEventManager.eventState) {
-                    LavaEventState.NOT_RUNNING -> sender.sendMessage(Message.LAVA_EVENT_NOT_RUNNING.getMessage())
-                    LavaEventState.RUNNING -> sender.sendMessage(Message.LAVA_EVENT_RUNNING.getMessage())
-                    LavaEventState.FINISHED -> sender.sendMessage(Message.LAVA_EVENT_FINISHED.getMessage())
+
+                val uuid = player.uniqueId
+                if (lavaEvent.participants.containsKey(uuid)) {
+                    player.sendMessage(Message.LAVA_EVENT_JOIN_ALREADY.getMessage())
+                    return true
+                }
+
+                when (lavaEvent.state) {
+                    LavaEventState.RUNNING -> player.sendMessage(Message.LAVA_EVENT_RUNNING.getMessage())
                     LavaEventState.OPEN -> {
-                        val state = main.lavaEventManager.getState(sender)
-                        if (state == null || state == PlayerState.OUT) {
-                            main.lavaEventManager.setState(sender, PlayerState.WAITING)
-                            Bukkit.getOnlinePlayers().filter { it != sender}.forEach {
-                                it.sendMessage(Message.LAVA_EVENT_JOIN.getMessage()
-                                    .replace("%player", sender.name))
-                            }
-                            sender.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
-                            sender.teleport(main.dataManager.lavaEventArea.spawn!!)
+                        lavaEvent.participants[uuid] = PlayerState.PARTICIPATING
+                        Bukkit.getOnlinePlayers().filter { it != player}.forEach {
+                            it.sendMessage(Message.LAVA_EVENT_JOIN.getMessage()
+                                .replace("%player", player.name))
                         }
+                        player.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
+                        player.teleport(main.lavaEventArea.spawn!!)
                     }
                 }
             }
             "leave" -> {
-                if (sender !is Player) {
-                    sender.sendMessage("§cThis command is for players only.")
+                if (!checkConditions(true, null, sender)) return true
+                val player = sender as Player
+
+                val lavaEvent = main.lavaEvent
+                if (lavaEvent == null) {
+                    player.sendMessage(Message.LAVA_EVENT_NOT_RUNNING.getMessage())
                     return true
                 }
 
-                val state = main.lavaEventManager.getState(sender)
-                if (state == null || state == PlayerState.OUT) {
-                    sender.sendMessage(Message.LAVA_EVENT_NOT_IN.getMessage())
+                val uuid = player.uniqueId
+                if (!lavaEvent.participants.containsKey(uuid)) {
+                    player.sendMessage(Message.LAVA_EVENT_NOT_IN.getMessage())
                     return true
                 }
 
-                when (main.lavaEventManager.eventState) {
-                    LavaEventState.NOT_RUNNING -> sender.sendMessage(Message.LAVA_EVENT_NOT_RUNNING.getMessage())
+                when (lavaEvent.state) {
                     LavaEventState.RUNNING -> {
-                        when (state) {
+                        when (lavaEvent.participants[uuid]) {
                             PlayerState.PARTICIPATING -> {
-
+                                // TODO
                             }
                             PlayerState.SPECTATING -> {
-
+                                // TODO
                             }
-                            else -> {
-
-                            }
-                        }
-                    }
-                    LavaEventState.FINISHED -> {
-                        when (state) {
-                            PlayerState.SPECTATING -> {
-
-                            }
-                            else -> {
-
-                            }
+                            else -> {}
                         }
                     }
                     LavaEventState.OPEN -> {
-                        if (state == PlayerState.OUT) {
-                            main.lavaEventManager.setState(sender, PlayerState.WAITING)
-                            Bukkit.getOnlinePlayers().filter { it != sender}.forEach {
-                                it.sendMessage(Message.LAVA_EVENT_JOIN.getMessage()
-                                    .replace("%player", sender.name))
-                            }
-                            sender.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
-                            sender.teleport(main.dataManager.lavaEventArea.spawn!!)
-                        }
+                        lavaEvent.participants.remove(uuid)
+                        sender.sendMessage(Message.LAVA_EVENT_LEAVE.getMessage())
+                        // TODO teleport to spawn
                     }
                 }
             }
@@ -131,15 +90,60 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
             "stop" -> {
 
             }
-            "setspawn" -> SetSpawnCommand(sender, args).runTask(main)
-            "setspectate" -> SetSpectateCommand(sender, args).runTask(main)
-            "setradius" -> SetRadiusCommand(sender, args).runTask(main)
+            "setspawn" -> {
+                if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
+                    return true
+                }
+                val player = sender as Player
+                main.lavaEventArea.spawn = player.location
+                player.sendMessage(Message.LAVA_EVENT_SET_SPAWN_SUCCESS.getMessage())
+            }
+            "setspectate" -> {
+                if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
+                    return true
+                }
+                val player = sender as Player
+                main.dataManager.lavaEventArea.spectate = player.location
+                player.sendMessage(Message.LAVA_EVENT_SET_SPECTATE_SUCCESS.getMessage())
+            }
+            "setradius" -> {
+                if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
+                    return true
+                }
+
+                val radius: Int
+                try {
+                    radius = Integer.parseInt(args[1])
+                } catch (e: NumberFormatException) {
+                    sender.sendMessage(Message.INVALID_NUMBER.getMessage()
+                        .replace("%number", args[1]))
+                    return true
+                }
+
+                val player = sender as Player
+                main.lavaEventArea.radius = radius
+                player.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage())
+            }
             "setmaterial" -> {
 
             }
             "info" -> {
 
             }
+        }
+        return true
+    }
+
+    @Suppress("SameParameterValue")
+    private fun checkConditions(playerOnly: Boolean, permission: String?, sender: CommandSender) : Boolean {
+        if (playerOnly) {
+            if (sender !is Player) sender.sendMessage(Message.NO_PLAYER.getMessage())
+            return sender is Player
+        }
+
+        if (permission != null && !sender.hasPermission(permission)) {
+            sender.sendMessage(Message.NO_PERMS.getMessage())
+            return false
         }
         return true
     }

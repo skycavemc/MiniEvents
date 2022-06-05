@@ -1,8 +1,7 @@
 package de.leonheuer.skycave.minievents
 
-import de.leonheuer.skycave.minievents.lavaevent.command.LavaEventCommand
-import de.leonheuer.skycave.minievents.lavaevent.listener.DeathListener
-import de.leonheuer.skycave.minievents.lavaevent.manager.LavaEventManager
+import de.leonheuer.skycave.minievents.lavaevent.model.LavaEvent
+import de.leonheuer.skycave.minievents.lavaevent.model.LavaEventArea
 import de.leonheuer.skycave.minievents.manager.DataManager
 import de.leonheuer.skycave.minievents.miningcube.command.MiningCubeCommand
 import de.leonheuer.skycave.minievents.oregen.command.BoosterCommand
@@ -17,15 +16,15 @@ class MiniEvents: JavaPlugin() {
 
     lateinit var dataManager: DataManager
         private set
-    lateinit var lavaEventManager: LavaEventManager
-        private set
     lateinit var boosterManager: BoosterManager
         private set
+    lateinit var lavaEventArea: LavaEventArea
+        private set
+    var lavaEvent: LavaEvent? = null
 
     @Suppress("Deprecation")
     override fun onEnable() {
         dataManager = DataManager(this)
-        //lavaEventManager = LavaEventManager()
         boosterManager = BoosterManager(this)
 
         getCommand("miningcube")!!.setExecutor(MiningCubeCommand(this))

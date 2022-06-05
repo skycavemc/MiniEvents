@@ -8,6 +8,7 @@ enum class Message(private val message: String) {
     PREFIX("&e&l| &6Event &8» "),
     NO_PERMS("&cDu hast keine Rechte für diesen Befehl."),
     INVALID_NUMBER("&c%number ist keine gültige Zahl."),
+    NO_PLAYER("&cDieser Befehl ist nur für Spieler."),
 
 
     // mining cube general
@@ -118,11 +119,11 @@ enum class Message(private val message: String) {
     LAVA_EVENT_OUT_SELF("&cDu bist ausgeschieden und betrittst nun den Zuschauermodus. /lavaevent leave zum Verlassen."),
     LAVA_EVENT_JOIN("&a%player &7ist dem LavaEvent beigetreten."),
     LAVA_EVENT_JOIN_SELF("&7Du bist dem LavaEvent beigetreten."),
-    LAVA_EVENT_LEAVE_SELF("&cDu hast den %mode verlassen."),
+    LAVA_EVENT_JOIN_ALREADY("&cDu bist dem LavaEvent bereits beigetreten."),
     LAVA_EVENT_NOT_RUNNING("&cDerzeit läuft kein Lava Event."),
     LAVA_EVENT_RUNNING("&cDas Lava Event hat schon begonnen."),
-    LAVA_EVENT_FINISHED("&cDas Lava Event ist bereits vorbei."),
     LAVA_EVENT_NOT_IN("&cDu nimmst nicht am LavaEvent teil."),
+    LAVA_EVENT_LEAVE("&cDu hast das LavaEvent verlassen."),
 
     // lava event help
     LAVA_EVENT_HELP_JOIN("&e/lavaevent join\n&8» &7Tritt dem laufenden LavaEvent bei"),
@@ -146,7 +147,7 @@ enum class Message(private val message: String) {
     LAVA_EVENT_SET_RADIUS_SUCCESS("&aDer Radius wurde auf %radius gesetzt."),
 
     // lava event set material command
-    LAVA_EVENT_SET_MATERIAL_SUCCESS("&aDu hast erfolgreich den Beitrittsort gesetzt."),
+    LAVA_EVENT_SET_MATERIAL_SUCCESS("&aDu hast erfolgreich den Beitrittsort gesetzt."), // TODO
     ;
 
     fun getFormatted(): String {
