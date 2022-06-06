@@ -5,7 +5,7 @@ import org.bukkit.ChatColor
 enum class Message(private val message: String) {
 
     // global
-    PREFIX("&e&l| &6Event &8» "),
+    PREFIX("&d&l| &5Event &8» "),
     NO_PERMS("&cDu hast keine Rechte für diesen Befehl."),
     INVALID_NUMBER("&c%number ist keine gültige Zahl."),
     NO_PLAYER("&cDieser Befehl ist nur für Spieler."),
@@ -117,24 +117,28 @@ enum class Message(private val message: String) {
     // lava event general
     LAVA_EVENT_OUT("&c%player ist ausgeschieden."),
     LAVA_EVENT_OUT_SELF("&cDu bist ausgeschieden und betrittst nun den Zuschauermodus. /lavaevent leave zum Verlassen."),
-    LAVA_EVENT_JOIN("&a%player &7ist dem LavaEvent beigetreten."),
+    LAVA_EVENT_JOIN("&a%player &7ist dem LavaEvent beigetreten. &8(&3/lavaevent join&8)"),
     LAVA_EVENT_JOIN_SELF("&7Du bist dem LavaEvent beigetreten."),
     LAVA_EVENT_JOIN_ALREADY("&cDu bist dem LavaEvent bereits beigetreten."),
     LAVA_EVENT_NOT_RUNNING("&cDerzeit läuft kein Lava Event."),
     LAVA_EVENT_RUNNING("&cDas Lava Event hat schon begonnen."),
     LAVA_EVENT_NOT_IN("&cDu nimmst nicht am LavaEvent teil."),
     LAVA_EVENT_LEAVE("&cDu hast das LavaEvent verlassen."),
+    LAVA_EVENT_END("&7Das LavaEvent ist vorbei!"),
+    LAVA_EVENT_WINNERS("&7Es haben gewonnen: &a%winners"),
 
     // lava event help
     LAVA_EVENT_HELP_JOIN("&e/lavaevent join\n&8» &7Tritt dem laufenden LavaEvent bei"),
-    LAVA_EVENT_HELP_LEAVE("&e/lavaevent leave\n&8» &7Verlässt die Wartephase oder den Zuschauermodus"),
-    LAVA_EVENT_HELP_START("&e/lavaevent start <schwierigkeit>\n&8» &7Startet das LavaEvent mit der angegebenen Schwierigkeit"),
+    LAVA_EVENT_HELP_LEAVE("&e/lavaevent leave\n&8» &7Verlässt die Wartephase bzw. den Zuschauermodus"),
+    LAVA_EVENT_HELP_START("&e/lavaevent start\n&8» &7Startet das LavaEvent"),
     LAVA_EVENT_HELP_STOP("&e/lavaevent stop\n&8» &7Stoppt ein laufendes LavaEvent"),
     LAVA_EVENT_HELP_SET_SPAWN("&e/lavaevent setspawn\n&8» &7Legt den Beitrittsort fest"),
     LAVA_EVENT_HELP_SET_SPECTATE("&e/lavaevent setspectate\n&8» &7Legt den Zuschauerort fest"),
     LAVA_EVENT_HELP_SET_RADIUS("&e/lavaevent join\n&8» &7Setzt den Radius der Spielfläche"),
-    LAVA_EVENT_HELP_SET_MATERIAL("&e/lavaevent setmaterial <floor/lava> <material>\n" +
+    LAVA_EVENT_HELP_SET_MATERIAL("&e/lavaevent setmaterial <Material>\n" +
             "&8» &7Setzt das Material für den angegebenen Platzhalter"),
+    LAVA_EVENT_HELP_SET_PERIOD("&e/lavaevent setperiod <Dauer>\n" +
+            "&8» &7Setzt den Zeitabstand, in dem Blöcke verschwinden"),
     LAVA_EVENT_HELP_INFO("&e/lavaevent info\n&8» &7Liefert Informationen über das LavaEvent"),
 
     // lava event set spawn command
@@ -147,7 +151,17 @@ enum class Message(private val message: String) {
     LAVA_EVENT_SET_RADIUS_SUCCESS("&aDer Radius wurde auf %radius gesetzt."),
 
     // lava event set material command
-    LAVA_EVENT_SET_MATERIAL_SUCCESS("&aDu hast erfolgreich den Beitrittsort gesetzt."), // TODO
+    LAVA_EVENT_SET_MATERIAL_SUCCESS("&aDu hast erfolgreich das Material zu %material gesetzt."),
+
+    // lava event set period command
+    LAVA_EVENT_SET_PERIOD_SUCCESS("&aDu hast erfolgreich den Zeitabstand auf %period gesetzt."),
+
+    // lava event start command
+    LAVA_EVENT_START("&aDas LavaEvent wurde gestartet! &7Trete bei mit &3/lavaevent join"),
+    LAVA_EVENT_START_ALREADY("&cDas LavaEvent läuft bereits."),
+
+    // lava event stop command
+    LAVA_EVENT_STOP("&cDas LavaEvent wurde abgebrochen!"),
     ;
 
     fun getFormatted(): String {

@@ -4,7 +4,6 @@ import de.leonheuer.skycave.minievents.MiniEvents
 import de.leonheuer.skycave.minievents.enums.Message
 import de.leonheuer.skycave.minievents.lavaevent.enums.LavaEventState
 import de.leonheuer.skycave.minievents.lavaevent.enums.PlayerState
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -27,11 +26,7 @@ class DeathListener(private val main: MiniEvents): Listener {
             event.cause == EntityDamageEvent.DamageCause.LAVA
         ) {
             lavaEvent.participants[uuid] = PlayerState.SPECTATING
-            for (otherUuid in lavaEvent.participants.keys) {
-                if (otherUuid == uuid) continue
-                val other = Bukkit.getPlayer(otherUuid) ?: continue
-                other.sendMessage(Message.LAVA_EVENT_OUT.getMessage().replace("%player", player.name))
-            }
+            lavaEvent.out(player)
             player.sendMessage(Message.LAVA_EVENT_OUT_SELF.getMessage())
             player.teleport(main.lavaEventArea.spectate!!)
         }

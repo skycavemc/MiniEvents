@@ -1,8 +1,6 @@
-package de.leonheuer.skycave.minievents.manager
+package de.leonheuer.skycave.minievents.storage
 
 import de.leonheuer.skycave.minievents.MiniEvents
-import de.leonheuer.skycave.minievents.lavaevent.enums.EventMaterial
-import de.leonheuer.skycave.minievents.lavaevent.model.LavaEventArea
 import de.leonheuer.skycave.minievents.miningcube.model.MiningArea
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -16,16 +14,13 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
-import java.lang.NullPointerException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
-import kotlin.collections.HashMap
 
 class DataManager(private val main: MiniEvents) {
 
     private val miningAreaList = ArrayList<MiningArea>()
-    var lavaEventArea = LavaEventArea(null, null, 0, EnumMap(EventMaterial::class.java))
     private val path = main.dataFolder.path
 
     init {
