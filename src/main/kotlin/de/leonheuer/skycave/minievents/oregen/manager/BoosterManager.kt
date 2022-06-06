@@ -5,13 +5,12 @@ import de.leonheuer.skycave.minievents.enums.Message
 import org.bukkit.Bukkit
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
-import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.scheduler.BukkitTask
 
 class BoosterManager(private val main: MiniEvents) {
 
     val bossBar = Bukkit.getServer().createBossBar("", BarColor.PURPLE, BarStyle.SOLID)
-    private var resetTask: BukkitRunnable? = null
+    private var resetTask: BukkitTask? = null
     var isRunning: Boolean = false
         private set
     var multiplier: Int = 0
@@ -27,21 +26,15 @@ class BoosterManager(private val main: MiniEvents) {
         finished = System.currentTimeMillis() + seconds * 1000L
         isRunning = true
 
-        Bukkit.getOnlinePlayers().forEach { player: Player? -> bossBar.addPlayer(player!!) }
+        Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer)
         bossBar.isVisible = true
         bossBar.setTitle(Message.BOOSTER_BOSS_BAR.getFormatted().replace("%durance", getDurance()))
         bossBar.progress = 1.0
-
-        resetTask = object : BukkitRunnable() {
-            override fun run() {
-                reset()
-            }
-        }
-        (resetTask as BukkitRunnable).runTaskLater(main,seconds * 20L)
+        resetTask = Bukkit.getScheduler().runTaskLater(main, this::reset, seconds * 20L)
     }
 
     fun reset() {
-        resetTask?.cancel()
+        resetTask!!.cancel()
 
         multiplier = 1
         isRunning = false

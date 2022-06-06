@@ -8,7 +8,6 @@ import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scheduler.BukkitRunnable
 import kotlin.random.Random
 
 object Util {
@@ -22,21 +21,21 @@ object Util {
             for (y in getIntRange(from.blockY, to.blockY)) {
                 for (z in getIntRange(from.blockZ, to.blockZ)) {
                     val pos = Location(miningArea.world, x.toDouble(), y.toDouble(), z.toDouble())
-                    pos.block.type = getRandomMaterialFromHashMap(miningArea.chances)
+                    pos.block.type = randomMaterialByChance(miningArea.chances)
                 }
             }
         }
     }
 
-    private fun getRandomMaterialFromHashMap(hashMap: HashMap<Material, Int>): Material {
+    private fun randomMaterialByChance(map: Map<Material, Int>): Material {
         var random = Random.nextInt(1000)
-        for (entry in hashMap) {
+        for (entry in map) {
             random -= entry.value
             if (random < 0) {
                 return entry.key
             }
         }
-        return hashMap.keys.last()
+        return map.keys.last()
     }
 
     private fun getIntRange(first: Int, second: Int): IntRange {

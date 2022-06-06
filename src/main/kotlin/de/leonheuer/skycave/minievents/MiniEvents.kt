@@ -40,6 +40,10 @@ class MiniEvents: JavaPlugin() {
         server.scheduler.runTaskTimerAsynchronously(this, Runnable {
             if (boosterManager.isRunning) {
                 val timeBetween = boosterManager.finished - System.currentTimeMillis()
+                if (timeBetween < 0) {
+                    boosterManager.bossBar.progress = 0.0
+                    return@Runnable
+                }
                 val progress = timeBetween / (boosterManager.seconds * 1000.0)
                 boosterManager.bossBar.progress = progress
             }
