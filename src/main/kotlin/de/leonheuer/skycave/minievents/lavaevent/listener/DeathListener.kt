@@ -28,7 +28,7 @@ class DeathListener(private val main: MiniEvents): Listener {
             lavaEvent.participants[uuid] = PlayerState.SPECTATING
             lavaEvent.out(player)
             player.sendMessage(Message.LAVA_EVENT_OUT_SELF.getMessage())
-            player.teleport(main.lavaEventArea.spectate!!)
+            player.teleport(main.dataManager.lavaEventArea.spectate!!)
         }
     }
 

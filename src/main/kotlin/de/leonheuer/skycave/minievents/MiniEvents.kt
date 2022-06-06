@@ -3,7 +3,6 @@ package de.leonheuer.skycave.minievents
 import de.leonheuer.skycave.minievents.lavaevent.command.LavaEventCommand
 import de.leonheuer.skycave.minievents.lavaevent.listener.DeathListener
 import de.leonheuer.skycave.minievents.lavaevent.model.LavaEvent
-import de.leonheuer.skycave.minievents.lavaevent.model.LavaEventArea
 import de.leonheuer.skycave.minievents.storage.DataManager
 import de.leonheuer.skycave.minievents.miningcube.command.MiningCubeCommand
 import de.leonheuer.skycave.minievents.oregen.command.BoosterCommand
@@ -20,8 +19,6 @@ class MiniEvents: JavaPlugin() {
     lateinit var dataManager: DataManager
         private set
     lateinit var boosterManager: BoosterManager
-        private set
-    lateinit var lavaEventArea: LavaEventArea //TODO persistent storage
         private set
     var lavaEvent: LavaEvent? = null
 
@@ -65,7 +62,7 @@ class MiniEvents: JavaPlugin() {
     }
 
     override fun onDisable() {
-        dataManager.writeToFile()
+        dataManager.saveMiningAreas()
     }
 
 }

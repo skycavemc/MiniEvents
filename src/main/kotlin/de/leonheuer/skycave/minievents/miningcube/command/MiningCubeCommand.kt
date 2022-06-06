@@ -31,7 +31,7 @@ class MiningCubeCommand(private val main: MiniEvents): CommandExecutor, TabCompl
         sender, args, true, 2, false, Message.MINING_CUBE_CREATE_SYNTAX
     ) {
         override fun execute() {
-            if (main.dataManager.isKeyExisting(args[1])) {
+            if (main.dataManager.getMiningArea(args[1]) != null) {
                 player.sendMessage(Message.MINING_CUBE_CREATE_EXISTS.getMessage()
                     .replace("%name", args[1]))
                 return

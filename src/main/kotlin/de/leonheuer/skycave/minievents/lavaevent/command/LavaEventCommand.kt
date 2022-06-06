@@ -49,7 +49,7 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                                 .replace("%player", player.name))
                         }
                         player.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
-                        player.teleport(main.lavaEventArea.spawn!!)
+                        player.teleport(main.dataManager.lavaEventArea.spawn!!)
                     }
                 }
             }
@@ -83,8 +83,13 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     sender.sendMessage(Message.LAVA_EVENT_START_ALREADY.getMessage())
                     return true
                 }
+                val area = main.dataManager.lavaEventArea
+                if (area.spawn == null || area.spectate == null || area.radius <= 1 || area.period <= 0) {
+                    sender.sendMessage(Message.LAVA_EVENT_START_CONFIG.getMessage())
+                    return true
+                }
                 Bukkit.broadcast(Component.text(Message.LAVA_EVENT_START.getMessage()))
-                main.lavaEvent = LavaEvent(main.lavaEventArea)
+                main.lavaEvent = LavaEvent(main.dataManager.lavaEventArea)
                 main.lavaEvent!!.start() //TODO countdown
             }
             "stop" -> {
@@ -105,7 +110,8 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
                 val player = sender as Player
-                main.lavaEventArea.spawn = player.location
+                main.dataManager.lavaEventArea.spawn = player.location
+                main.dataManager.saveLavaEventArea()
                 player.sendMessage(Message.LAVA_EVENT_SET_SPAWN_SUCCESS.getMessage())
             }
             "setspectate" -> {
@@ -113,7 +119,8 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
                 val player = sender as Player
-                main.lavaEventArea.spectate = player.location
+                main.dataManager.lavaEventArea.spectate = player.location
+                main.dataManager.saveLavaEventArea()
                 player.sendMessage(Message.LAVA_EVENT_SET_SPECTATE_SUCCESS.getMessage())
             }
             "setradius" -> {
@@ -131,17 +138,18 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                 }
 
                 val player = sender as Player
-                main.lavaEventArea.radius = radius
+                main.dataManager.lavaEventArea.radius = radius
+                main.dataManager.saveLavaEventArea()
                 player.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage())
             }
             "setmaterial" -> {
-
+                //TODO setmaterial command
             }
             "setperiod" -> {
-
+                //TODO setperiod command
             }
             "info" -> {
-
+                //TODO info command
             }
         }
         return true

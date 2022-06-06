@@ -159,6 +159,7 @@ enum class Message(private val message: String) {
     // lava event start command
     LAVA_EVENT_START("&aDas LavaEvent wurde gestartet! &7Trete bei mit &3/lavaevent join"),
     LAVA_EVENT_START_ALREADY("&cDas LavaEvent läuft bereits."),
+    LAVA_EVENT_START_CONFIG("&cDas LavaEvent ist noch nicht vollständig eingerichtet!"),
 
     // lava event stop command
     LAVA_EVENT_STOP("&cDas LavaEvent wurde abgebrochen!"),
