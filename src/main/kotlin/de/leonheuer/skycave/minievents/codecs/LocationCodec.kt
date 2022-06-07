@@ -23,10 +23,12 @@ class LocationCodec: Codec<Location?> {
         return location
     }
 
-    override fun decode(json: JSONObject?): Location? {
-        if (json == null) {
+    override fun decode(obj: Any?): Location? {
+        if (obj == null) {
             return null
         }
+        val json = obj as JSONObject
+
         val world = Bukkit.getWorld(
             UUID.fromString(json["world"] as String)
         )!!

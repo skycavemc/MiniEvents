@@ -89,8 +89,9 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
                 Bukkit.broadcast(Component.text(Message.LAVA_EVENT_START.getMessage()))
-                main.lavaEvent = LavaEvent(main.dataManager.lavaEventArea)
-                main.lavaEvent!!.start() //TODO countdown
+                val event = LavaEvent(main.dataManager.lavaEventArea)
+                main.lavaEvent = event
+                Bukkit.getScheduler().runTaskLater(main, event::start, 100L) //TODO countdown
             }
             "stop" -> {
                 if (!checkConditions(false, "skybee.minievent.lavaevent.start", sender)) {
@@ -140,13 +141,31 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                 val player = sender as Player
                 main.dataManager.lavaEventArea.radius = radius
                 main.dataManager.saveLavaEventArea()
-                player.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage())
+                player.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage()
+                    .replace("%radius", radius.toString()))
             }
             "setmaterial" -> {
                 //TODO setmaterial command
             }
             "setperiod" -> {
-                //TODO setperiod command
+                if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
+                    return true
+                }
+
+                val period: Int
+                try {
+                    period = Integer.parseInt(args[1])
+                } catch (e: NumberFormatException) {
+                    sender.sendMessage(Message.INVALID_NUMBER.getMessage()
+                        .replace("%number", args[1]))
+                    return true
+                }
+
+                val player = sender as Player
+                main.dataManager.lavaEventArea.period = period
+                main.dataManager.saveLavaEventArea()
+                player.sendMessage(Message.LAVA_EVENT_SET_PERIOD_SUCCESS.getMessage()
+                    .replace("%period", period.toString()))
             }
             "info" -> {
                 //TODO info command

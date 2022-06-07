@@ -23,13 +23,14 @@ class LavaEventAreaCodec(
         return lavaEventArea
     }
 
-    override fun decode(json: JSONObject?): LavaEventArea? {
-        if (json == null) {
+    override fun decode(obj: Any?): LavaEventArea? {
+        if (obj == null) {
             return null
         }
+        val json = obj as JSONObject
 
-        val spawn = locationCodec.decode(json["spawn"] as JSONObject)
-        val spectate = locationCodec.decode(json["spectate"] as JSONObject)
+        val spawn = locationCodec.decode(json["spawn"])
+        val spectate = locationCodec.decode(json["spectate"])
         val radius = json["radius"] as Long
         val period = json["period"] as Long
         val material = Material.valueOf(json["material"] as String)

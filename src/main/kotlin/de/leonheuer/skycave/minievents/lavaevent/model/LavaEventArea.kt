@@ -24,7 +24,7 @@ data class LavaEventArea(
                     x.toDouble().pow(2) + z.toDouble().pow(2)
                 )
                 if (distanceToCenter < radius + 1) {
-                    val loc = spawn.clone().add(x.toDouble(), 0.0, z.toDouble())
+                    val loc = spawn.clone().add(x.toDouble(), -1.0, z.toDouble())
                     val block = spawn.world.getBlockAt(loc)
                     result.add(block)
                 }

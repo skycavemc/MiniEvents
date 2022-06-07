@@ -35,14 +35,16 @@ class MiningAreaCodec(
                 chances.add(chanceObj)
             }
         }
+        miningArea["chances"] = chances
 
         return miningArea
     }
 
-    override fun decode(json: JSONObject?): MiningArea? {
-        if (json == null) {
+    override fun decode(obj: Any?): MiningArea? {
+        if (obj == null) {
             return null
         }
+        val json = obj as JSONObject
 
         val uuid = UUID.fromString(json["uuid"] as String)
         val key = json["key"] as String

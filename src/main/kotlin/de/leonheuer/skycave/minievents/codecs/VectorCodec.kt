@@ -12,22 +12,23 @@ class VectorCodec: Codec<Vector?> {
         }
 
         val vector = JSONObject()
-        vector["x"] = obj.x
-        vector["y"] = obj.y
-        vector["z"] = obj.z
+        vector["x"] = obj.x.toLong()
+        vector["y"] = obj.y.toLong()
+        vector["z"] = obj.z.toLong()
         return vector
     }
 
-    override fun decode(json: JSONObject?): Vector? {
-        if (json == null) {
+    override fun decode(obj: Any?): Vector? {
+        if (obj == null) {
             return null
         }
+        val json = obj as JSONObject
 
-        val x = json["x"] as Double
-        val y = json["y"] as Double
-        val z = json["z"] as Double
+        val x = json["x"] as Long
+        val y = json["y"] as Long
+        val z = json["z"] as Long
 
-        return Vector(x, y, z)
+        return Vector(x.toDouble(), y.toDouble(), z.toDouble())
     }
 
     override fun getEncoderClass(): Class<Vector> {

@@ -5,7 +5,7 @@ import org.json.simple.JSONObject
 interface Codec<T> {
 
     fun encode(obj: T): JSONObject?
-    fun decode(json: JSONObject?): T
+    fun decode(obj: Any?): T
     fun getEncoderClass(): Class<out T>
 
 }

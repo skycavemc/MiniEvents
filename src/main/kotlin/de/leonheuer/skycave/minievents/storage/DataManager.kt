@@ -39,13 +39,16 @@ class DataManager(private val main: MiniEvents) {
         if (!dir.isDirectory) dir.mkdirs()
 
         val file = File("$path/lavaEventArea.json")
-        try {
-            if (!file.isFile) file.createNewFile()
-            lavaEventArea = LavaEventArea(null, null, 0, 0, Material.OBSIDIAN)
-            saveLavaEventArea()
+        if (!file.isFile) {
+            try {
+                file.createNewFile()
+                main.logger.info("Created new lava event area file.")
+                lavaEventArea = LavaEventArea(null, null, 0, 0, Material.OBSIDIAN)
+                saveLavaEventArea()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
             return
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
 
         val parser = JSONParser()
@@ -53,6 +56,7 @@ class DataManager(private val main: MiniEvents) {
             val obj = parser.parse(FileReader(file)) as JSONObject
             val area = lavaEventAreaCodec.decode(obj) ?: return
             lavaEventArea = area
+            main.logger.info("Loaded lava event area file.")
         } catch (e: ParseException) {
             e.printStackTrace()
         } catch (e: NullPointerException) {
@@ -92,6 +96,7 @@ class DataManager(private val main: MiniEvents) {
 
         val parser = JSONParser()
         for (file in files) {
+            if (!file.isFile) continue
             try {
                 val obj = parser.parse(FileReader(file)) as JSONObject
                 val area = miningAreaCodec.decode(obj) ?: continue

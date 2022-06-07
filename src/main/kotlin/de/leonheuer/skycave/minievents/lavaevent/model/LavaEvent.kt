@@ -7,6 +7,7 @@ import de.leonheuer.skycave.minievents.lavaevent.enums.PlayerState
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -41,6 +42,7 @@ class LavaEvent(private val area: LavaEventArea) {
     private fun nextBlock() {
         val block = untouchedBlocks.random()
         block.type = Material.LAVA
+        block.world.spawnParticle(Particle.LAVA, block.location.clone().add(0.0, 1.0, 0.0), 5)
 
         untouchedBlocks.remove(block)
         touchedBlocks.add(block)
