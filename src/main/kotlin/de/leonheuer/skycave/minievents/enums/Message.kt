@@ -8,6 +8,7 @@ enum class Message(private val message: String) {
     PREFIX("&d&l| &5Event &8» "),
     NO_PERMS("&cDu hast keine Rechte für diesen Befehl."),
     INVALID_NUMBER("&c%number ist keine gültige Zahl."),
+    INVALID_MATERIAL("&cBitte gib ein gültiges Material an."),
     NO_PLAYER("&cDieser Befehl ist nur für Spieler."),
 
 
@@ -117,15 +118,19 @@ enum class Message(private val message: String) {
     // lava event general
     LAVA_EVENT_OUT("&c%player ist ausgeschieden."),
     LAVA_EVENT_OUT_SELF("&cDu bist ausgeschieden und betrittst nun den Zuschauermodus. /lavaevent leave zum Verlassen."),
-    LAVA_EVENT_JOIN("&a%player &7ist dem LavaEvent beigetreten. &8(&3/lavaevent join&8)"),
+    LAVA_EVENT_JOIN("&a%player &7ist dem LavaEvent beigetreten."),
     LAVA_EVENT_JOIN_SELF("&7Du bist dem LavaEvent beigetreten."),
     LAVA_EVENT_JOIN_ALREADY("&cDu bist dem LavaEvent bereits beigetreten."),
     LAVA_EVENT_NOT_RUNNING("&cDerzeit läuft kein Lava Event."),
     LAVA_EVENT_RUNNING("&cDas Lava Event hat schon begonnen."),
     LAVA_EVENT_NOT_IN("&cDu nimmst nicht am LavaEvent teil."),
     LAVA_EVENT_LEAVE("&cDu hast das LavaEvent verlassen."),
-    LAVA_EVENT_END("&7Das LavaEvent ist vorbei!"),
-    LAVA_EVENT_WINNERS("&7Es haben gewonnen: &a%winners"),
+    LAVA_EVENT_WINNERS("&6Das LavaEvent ist vorbei! Es haben gewonnen: &a%winners"),
+    LAVA_EVENT_COMMAND("&cDu darfst keine Befehle ausführen, während du am Lava Event teilnimmst. " +
+            "&7Du kannst das Event mit /lavaevent leave verlassen."),
+    LAVA_EVENT_COUNTDOWN("&2Noch %seconds Sekunden bis zum Beginn! &a/lavaevent join"),
+    LAVA_EVENT_ABORT("&cDas LavaEvent wurde abgebrochen, da mindestens 2 Teilnehmer benötigt werden."),
+    LAVA_EVENT_BEGIN("&aDas LavaEvent beginnt!"),
 
     // lava event help
     LAVA_EVENT_HELP_JOIN("&e/lavaevent join\n&8» &7Tritt dem laufenden LavaEvent bei"),
@@ -163,6 +168,10 @@ enum class Message(private val message: String) {
 
     // lava event stop command
     LAVA_EVENT_STOP("&cDas LavaEvent wurde abgebrochen!"),
+
+    // lava event info command
+    LAVA_EVENT_INFO_HEADER("&6Informationen zum LavaEvent"),
+    LAVA_EVENT_INFO("&3%property: &7%value"),
     ;
 
     fun getFormatted(): String {

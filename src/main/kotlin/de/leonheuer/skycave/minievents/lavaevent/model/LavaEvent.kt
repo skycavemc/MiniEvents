@@ -34,6 +34,7 @@ class LavaEvent(private val area: LavaEventArea) {
         limit = untouchedBlocks.count() / 12
 
         state = LavaEventState.RUNNING
+        Bukkit.broadcast(Component.text(Message.LAVA_EVENT_BEGIN.getMessage()))
         val main = JavaPlugin.getPlugin(MiniEvents::class.java)
         scheduler = Bukkit.getScheduler().runTaskTimer(main, this::nextBlock, 0, area.period * 20L)
         return true
@@ -69,7 +70,6 @@ class LavaEvent(private val area: LavaEventArea) {
         }
         participants.clear()
 
-        Bukkit.broadcast(Component.text(Message.LAVA_EVENT_END.getMessage()))
         Bukkit.broadcast(Component.text(Message.LAVA_EVENT_WINNERS.getMessage()
             .replace("%winners", winners.toString())))
         return true

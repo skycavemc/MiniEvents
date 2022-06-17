@@ -5,15 +5,18 @@ import de.leonheuer.skycave.minievents.enums.Message
 import de.leonheuer.skycave.minievents.lavaevent.enums.LavaEventState
 import de.leonheuer.skycave.minievents.lavaevent.enums.PlayerState
 import de.leonheuer.skycave.minievents.lavaevent.model.LavaEvent
+import de.leonheuer.skycave.minievents.util.Util
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
+import java.util.StringJoiner
 
 class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabCompleter {
 
@@ -71,8 +74,8 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
 
                 lavaEvent.participants.remove(uuid)
                 lavaEvent.out(player)
-                sender.sendMessage(Message.LAVA_EVENT_LEAVE.getMessage())
-                //TODO teleport to spawn
+                player.sendMessage(Message.LAVA_EVENT_LEAVE.getMessage())
+                player.teleport(main.multiverse.mvWorldManager.getMVWorld("Builder").spawnLocation)
             }
             "start" -> {
                 if (!checkConditions(false, "skybee.minievent.lavaevent.start", sender)) {
@@ -88,10 +91,20 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     sender.sendMessage(Message.LAVA_EVENT_START_CONFIG.getMessage())
                     return true
                 }
+
                 Bukkit.broadcast(Component.text(Message.LAVA_EVENT_START.getMessage()))
+                countdown(60, 0, 20, 40, 50, 57, 58, 59)
                 val event = LavaEvent(main.dataManager.lavaEventArea)
                 main.lavaEvent = event
-                Bukkit.getScheduler().runTaskLater(main, event::start, 100L) //TODO countdown
+
+                Bukkit.getScheduler().runTaskLater(main, Runnable {
+                    if (event.participants.count() < 2) {
+                        Bukkit.broadcast(Component.text(Message.LAVA_EVENT_ABORT.getMessage()))
+                        return@Runnable
+                    }
+                    Bukkit.getOnlinePlayers().forEach { it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f) }
+                    event.start()
+                }, 20L * 60)
             }
             "stop" -> {
                 if (!checkConditions(false, "skybee.minievent.lavaevent.start", sender)) {
@@ -125,7 +138,7 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                 player.sendMessage(Message.LAVA_EVENT_SET_SPECTATE_SUCCESS.getMessage())
             }
             "setradius" -> {
-                if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
+                if (!checkConditions(false, "skybee.minievent.lavaevent.admin", sender)) {
                     return true
                 }
 
@@ -138,17 +151,31 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
 
-                val player = sender as Player
                 main.dataManager.lavaEventArea.radius = radius
                 main.dataManager.saveLavaEventArea()
-                player.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_SET_RADIUS_SUCCESS.getMessage()
                     .replace("%radius", radius.toString()))
             }
             "setmaterial" -> {
-                //TODO setmaterial command
+                if (!checkConditions(false, "skybee.minievent.lavaevent.admin", sender)) {
+                    return true
+                }
+
+                val material: Material
+                try {
+                    material = Material.valueOf(args[1])
+                } catch (e: IllegalArgumentException) {
+                    sender.sendMessage(Message.INVALID_MATERIAL.getMessage())
+                    return true
+                }
+
+                main.dataManager.lavaEventArea.material = material
+                main.dataManager.saveLavaEventArea()
+                sender.sendMessage(Message.LAVA_EVENT_SET_MATERIAL_SUCCESS.getMessage()
+                    .replace("%material", material.name))
             }
             "setperiod" -> {
-                if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
+                if (!checkConditions(false, "skybee.minievent.lavaevent.admin", sender)) {
                     return true
                 }
 
@@ -161,14 +188,48 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
 
-                val player = sender as Player
                 main.dataManager.lavaEventArea.period = period
                 main.dataManager.saveLavaEventArea()
-                player.sendMessage(Message.LAVA_EVENT_SET_PERIOD_SUCCESS.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_SET_PERIOD_SUCCESS.getMessage()
                     .replace("%period", period.toString()))
             }
             "info" -> {
-                //TODO info command
+                if (!checkConditions(false, "skybee.minievent.lavaevent.admin", sender)) {
+                    return true
+                }
+
+                val area = main.dataManager.lavaEventArea
+                val spawn = area.spawn
+                val spawnLocation = if (spawn == null) "§cNoch nicht gesetzt" else Util.locationAsString(spawn)
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    .replace("%property", "Spawn").replace("%value", spawnLocation))
+                val spectate = area.spectate
+                val spectateLocation = if (spectate == null) "§cNoch nicht gesetzt" else Util.locationAsString(spectate)
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    .replace("%property", "Spectate").replace("%value", spectateLocation))
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    .replace("%property", "Radius").replace("%value", area.radius.toString()))
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    .replace("%property", "Period").replace("%value", area.period.toString()))
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    .replace("%property", "Material").replace("%value", area.material.toString()))
+
+                val event = main.lavaEvent
+                if (event != null) {
+                    val state = if (event.state == LavaEventState.OPEN) "§aoffen" else "§claufend"
+                    sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                        .replace("%property", "Status").replace("%value", state))
+                    val participants = StringJoiner(", ")
+                    var count = 0
+                    event.participants.keys.forEach {
+                        val player = Bukkit.getPlayer(it) ?: return@forEach
+                        participants.add(player.name)
+                        count++
+                    }
+                    val participantsMessage = if (count == 0) "§ckeiner" else participants.toString()
+                    sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                        .replace("%property", "Teilnehmer").replace("%value", participantsMessage))
+                }
             }
         }
         return true
@@ -199,6 +260,17 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
         sender.sendMessage(Message.LAVA_EVENT_HELP_SET_MATERIAL.getFormatted())
         sender.sendMessage(Message.LAVA_EVENT_HELP_SET_PERIOD.getFormatted())
         sender.sendMessage(Message.LAVA_EVENT_HELP_INFO.getFormatted())
+    }
+
+    @Suppress("SameParameterValue")
+    private fun countdown(timeToStart: Int, vararg seconds: Int) {
+        for (delay in seconds) {
+            Bukkit.getScheduler().runTaskLater(main, Runnable {
+                Bukkit.broadcast(Component.text(Message.LAVA_EVENT_COUNTDOWN.getMessage()
+                    .replace("%seconds", (timeToStart - delay).toString())))
+            }, 20L * delay)
+            Bukkit.getOnlinePlayers().forEach { it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f) }
+        }
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): MutableList<String> {

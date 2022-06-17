@@ -8,6 +8,7 @@ import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.plugin.java.JavaPlugin
+import java.text.DecimalFormat
 import kotlin.random.Random
 
 object Util {
@@ -183,6 +184,15 @@ object Util {
         Bukkit.getOnlinePlayers().forEach {
             it.playSound(it.location, sound, 1f, 1f)
         }
+    }
+
+    fun locationAsString(location: Location): String {
+        val format = DecimalFormat("0.##")
+        val x = format.format(location.x)
+        val y = format.format(location.y)
+        val z = format.format(location.z)
+        val world = location.world.name
+        return "X: $x, Y: $y, Z: $z, $world"
     }
 
 }

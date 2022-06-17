@@ -1,6 +1,8 @@
 package de.leonheuer.skycave.minievents
 
+import com.onarandombox.MultiverseCore.MultiverseCore
 import de.leonheuer.skycave.minievents.lavaevent.command.LavaEventCommand
+import de.leonheuer.skycave.minievents.lavaevent.listener.CommandListener
 import de.leonheuer.skycave.minievents.lavaevent.listener.DeathListener
 import de.leonheuer.skycave.minievents.lavaevent.model.LavaEvent
 import de.leonheuer.skycave.minievents.storage.DataManager
@@ -20,11 +22,13 @@ class MiniEvents: JavaPlugin() {
         private set
     lateinit var boosterManager: BoosterManager
         private set
+    lateinit var multiverse: MultiverseCore
     var lavaEvent: LavaEvent? = null
 
     override fun onEnable() {
         dataManager = DataManager(this)
         boosterManager = BoosterManager(this)
+        multiverse = server.pluginManager.getPlugin("Multiverse-Core") as MultiverseCore
 
         registerCommand("miningcube", MiningCubeCommand(this))
         registerCommand("lavaevent", LavaEventCommand(this))
@@ -34,7 +38,8 @@ class MiniEvents: JavaPlugin() {
         registerEvents(
             DeathListener(this),
             CobbleGenerationListener(this),
-            PlayerJoinListener(this)
+            PlayerJoinListener(this),
+            CommandListener(this),
         )
 
         server.scheduler.runTaskTimerAsynchronously(this, Runnable {

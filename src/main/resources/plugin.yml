@@ -3,7 +3,7 @@ name: MiniEvents
 authors: [ Hakuyamu ]
 version: 2.0.0
 api-version: 1.18
-depend: [ SkyBeeCore ]
+depend: [ SkyBeeCore, Multiverse-Core ]
 
 commands:
   miningcube:

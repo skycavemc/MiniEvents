@@ -11,7 +11,7 @@ data class LavaEventArea(
     var spectate: Location?,
     var radius: Int,
     var period: Int,
-    val material: Material
+    var material: Material
     ) {
 
     fun getAllBlocks(): ArrayList<Block>? {
