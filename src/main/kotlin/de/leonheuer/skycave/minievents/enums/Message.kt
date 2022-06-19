@@ -128,6 +128,8 @@ enum class Message(private val message: String) {
     LAVA_EVENT_WINNERS("&6Das LavaEvent ist vorbei! Es haben gewonnen: &a%winners"),
     LAVA_EVENT_COMMAND("&cDu darfst keine Befehle ausführen, während du am Lava Event teilnimmst. " +
             "&7Du kannst das Event mit /lavaevent leave verlassen."),
+    LAVA_EVENT_TELEPORT("&cDu darfst dich nicht herausteleportieren, während du am Lava Event teilnimmst. " +
+            "&7Du kannst das Event mit /lavaevent leave verlassen."),
     LAVA_EVENT_COUNTDOWN("&2Noch %seconds Sekunden bis zum Beginn! &a/lavaevent join"),
     LAVA_EVENT_ABORT("&cDas LavaEvent wurde abgebrochen, da mindestens 2 Teilnehmer benötigt werden."),
     LAVA_EVENT_BEGIN("&aDas LavaEvent beginnt!"),
@@ -162,15 +164,15 @@ enum class Message(private val message: String) {
     LAVA_EVENT_SET_PERIOD_SUCCESS("&aDu hast erfolgreich den Zeitabstand auf %period gesetzt."),
 
     // lava event start command
-    LAVA_EVENT_START("&aDas LavaEvent wurde gestartet! &7Trete bei mit &3/lavaevent join"),
+    LAVA_EVENT_START("&dDas LavaEvent wurde gestartet!"),
     LAVA_EVENT_START_ALREADY("&cDas LavaEvent läuft bereits."),
-    LAVA_EVENT_START_CONFIG("&cDas LavaEvent ist noch nicht vollständig eingerichtet!"),
+    LAVA_EVENT_START_CONFIG("&cDas LavaEvent ist noch nicht vollständig eingerichtet."),
 
     // lava event stop command
     LAVA_EVENT_STOP("&cDas LavaEvent wurde abgebrochen!"),
 
     // lava event info command
-    LAVA_EVENT_INFO_HEADER("&6Informationen zum LavaEvent"),
+    LAVA_EVENT_INFO_HEADER("&e&m-------&6 Informationen zum LavaEvent &e&m-------"),
     LAVA_EVENT_INFO("&3%property: &7%value"),
     ;
 

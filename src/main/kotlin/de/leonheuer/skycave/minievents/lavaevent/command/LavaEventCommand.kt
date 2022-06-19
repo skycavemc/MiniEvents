@@ -15,10 +15,13 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 import org.bukkit.util.StringUtil
 import java.util.StringJoiner
 
 class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabCompleter {
+
+    private val tasks = ArrayList<BukkitTask>()
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
@@ -97,14 +100,16 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                 val event = LavaEvent(main.dataManager.lavaEventArea)
                 main.lavaEvent = event
 
-                Bukkit.getScheduler().runTaskLater(main, Runnable {
+                val task = Bukkit.getScheduler().runTaskLater(main, Runnable {
                     if (event.participants.count() < 2) {
                         Bukkit.broadcast(Component.text(Message.LAVA_EVENT_ABORT.getMessage()))
+                        main.lavaEvent = null
                         return@Runnable
                     }
-                    Bukkit.getOnlinePlayers().forEach { it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f) }
+                    Util.playSoundToAll(Sound.BLOCK_NOTE_BLOCK_PLING)
                     event.start()
                 }, 20L * 60)
+                tasks.add(task)
             }
             "stop" -> {
                 if (!checkConditions(false, "skybee.minievent.lavaevent.start", sender)) {
@@ -116,8 +121,10 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
                 Bukkit.broadcast(Component.text(Message.LAVA_EVENT_STOP.getMessage()))
-                lavaEvent.stop()
-                main.lavaEvent = null
+                if (!lavaEvent.stop()) {
+                    main.lavaEvent = null
+                }
+                tasks.forEach { it.cancel() }
             }
             "setspawn" -> {
                 if (!checkConditions(true, "skybee.minievent.lavaevent.admin", sender)) {
@@ -169,8 +176,10 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
 
-                main.dataManager.lavaEventArea.material = material
-                main.dataManager.saveLavaEventArea()
+                val dm = main.dataManager
+                dm.lavaEventArea.material = material
+                dm.lavaEventArea.getAllBlocks()?.forEach { it.type = material }
+                dm.saveLavaEventArea()
                 sender.sendMessage(Message.LAVA_EVENT_SET_MATERIAL_SUCCESS.getMessage()
                     .replace("%material", material.name))
             }
@@ -198,26 +207,28 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                     return true
                 }
 
+                sender.sendMessage(Message.LAVA_EVENT_INFO_HEADER.getFormatted())
+
                 val area = main.dataManager.lavaEventArea
                 val spawn = area.spawn
                 val spawnLocation = if (spawn == null) "§cNoch nicht gesetzt" else Util.locationAsString(spawn)
-                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                     .replace("%property", "Spawn").replace("%value", spawnLocation))
                 val spectate = area.spectate
                 val spectateLocation = if (spectate == null) "§cNoch nicht gesetzt" else Util.locationAsString(spectate)
-                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                     .replace("%property", "Spectate").replace("%value", spectateLocation))
-                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                     .replace("%property", "Radius").replace("%value", area.radius.toString()))
-                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                     .replace("%property", "Period").replace("%value", area.period.toString()))
-                sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                     .replace("%property", "Material").replace("%value", area.material.toString()))
 
                 val event = main.lavaEvent
                 if (event != null) {
                     val state = if (event.state == LavaEventState.OPEN) "§aoffen" else "§claufend"
-                    sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                         .replace("%property", "Status").replace("%value", state))
                     val participants = StringJoiner(", ")
                     var count = 0
@@ -227,9 +238,11 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                         count++
                     }
                     val participantsMessage = if (count == 0) "§ckeiner" else participants.toString()
-                    sender.sendMessage(Message.LAVA_EVENT_INFO.getMessage()
+                    sender.sendMessage(Message.LAVA_EVENT_INFO.getFormatted()
                         .replace("%property", "Teilnehmer").replace("%value", participantsMessage))
                 }
+
+                sender.sendMessage(Message.LAVA_EVENT_INFO_HEADER.getFormatted())
             }
         }
         return true
@@ -265,11 +278,12 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
     @Suppress("SameParameterValue")
     private fun countdown(timeToStart: Int, vararg seconds: Int) {
         for (delay in seconds) {
-            Bukkit.getScheduler().runTaskLater(main, Runnable {
+            val task = Bukkit.getScheduler().runTaskLater(main, Runnable {
                 Bukkit.broadcast(Component.text(Message.LAVA_EVENT_COUNTDOWN.getMessage()
                     .replace("%seconds", (timeToStart - delay).toString())))
+                Util.playSoundToAll(Sound.BLOCK_NOTE_BLOCK_BASS)
             }, 20L * delay)
-            Bukkit.getOnlinePlayers().forEach { it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f) }
+            tasks.add(task)
         }
     }
 

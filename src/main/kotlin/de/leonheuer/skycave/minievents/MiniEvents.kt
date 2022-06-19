@@ -4,6 +4,7 @@ import com.onarandombox.MultiverseCore.MultiverseCore
 import de.leonheuer.skycave.minievents.lavaevent.command.LavaEventCommand
 import de.leonheuer.skycave.minievents.lavaevent.listener.CommandListener
 import de.leonheuer.skycave.minievents.lavaevent.listener.DeathListener
+import de.leonheuer.skycave.minievents.lavaevent.listener.TeleportListener
 import de.leonheuer.skycave.minievents.lavaevent.model.LavaEvent
 import de.leonheuer.skycave.minievents.storage.DataManager
 import de.leonheuer.skycave.minievents.miningcube.command.MiningCubeCommand
@@ -40,6 +41,7 @@ class MiniEvents: JavaPlugin() {
             CobbleGenerationListener(this),
             PlayerJoinListener(this),
             CommandListener(this),
+            TeleportListener(this),
         )
 
         server.scheduler.runTaskTimerAsynchronously(this, Runnable {

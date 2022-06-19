@@ -180,7 +180,7 @@ object Util {
         }, delay)
     }
 
-    private fun playSoundToAll(sound: Sound) {
+    fun playSoundToAll(sound: Sound) {
         Bukkit.getOnlinePlayers().forEach {
             it.playSound(it.location, sound, 1f, 1f)
         }

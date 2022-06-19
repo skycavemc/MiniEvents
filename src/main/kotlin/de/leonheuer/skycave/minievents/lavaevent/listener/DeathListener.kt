@@ -26,12 +26,12 @@ class DeathListener(private val main: MiniEvents): Listener {
             event.cause == EntityDamageEvent.DamageCause.FIRE_TICK ||
             event.cause == EntityDamageEvent.DamageCause.LAVA
         ) {
-            lavaEvent.participants[uuid] = PlayerState.SPECTATING
-            lavaEvent.out(player)
             player.fireTicks = 0
             player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
             player.sendMessage(Message.LAVA_EVENT_OUT_SELF.getMessage())
             player.teleport(main.dataManager.lavaEventArea.spectate!!)
+            lavaEvent.participants[uuid] = PlayerState.SPECTATING
+            lavaEvent.out(player)
         }
     }
 

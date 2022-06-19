@@ -72,6 +72,7 @@ class LavaEvent(private val area: LavaEventArea) {
 
         Bukkit.broadcast(Component.text(Message.LAVA_EVENT_WINNERS.getMessage()
             .replace("%winners", winners.toString())))
+        JavaPlugin.getPlugin(MiniEvents::class.java).lavaEvent = null
         return true
     }
 
