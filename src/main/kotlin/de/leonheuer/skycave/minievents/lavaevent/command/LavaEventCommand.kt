@@ -49,13 +49,13 @@ class LavaEventCommand(private val main: MiniEvents): CommandExecutor, TabComple
                 when (lavaEvent.state) {
                     LavaEventState.RUNNING -> player.sendMessage(Message.LAVA_EVENT_RUNNING.getMessage())
                     LavaEventState.OPEN -> {
+                        player.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
+                        player.teleport(main.dataManager.lavaEventArea.spawn!!)
                         lavaEvent.participants[uuid] = PlayerState.PARTICIPATING
                         Bukkit.getOnlinePlayers().filter { it != player}.forEach {
                             it.sendMessage(Message.LAVA_EVENT_JOIN.getMessage()
                                 .replace("%player", player.name))
                         }
-                        player.sendMessage(Message.LAVA_EVENT_JOIN_SELF.getMessage())
-                        player.teleport(main.dataManager.lavaEventArea.spawn!!)
                     }
                 }
             }

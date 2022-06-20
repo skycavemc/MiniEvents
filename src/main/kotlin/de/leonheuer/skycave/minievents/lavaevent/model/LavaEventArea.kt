@@ -18,12 +18,12 @@ data class LavaEventArea(
         val spawn = this.spawn ?: return null
         val result = ArrayList<Block>()
 
-        for (x in (-1 * radius) .. radius) {
-            for (z in (-1 * radius) .. radius) {
+        for (x in -radius .. radius) {
+            for (z in -radius .. radius) {
                 val distanceToCenter = sqrt(
                     x.toDouble().pow(2) + z.toDouble().pow(2)
                 )
-                if (distanceToCenter < radius + 1) {
+                if (distanceToCenter < radius + 0.5) {
                     val loc = spawn.clone().add(x.toDouble(), -1.0, z.toDouble())
                     val block = spawn.world.getBlockAt(loc)
                     result.add(block)

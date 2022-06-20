@@ -1,7 +1,7 @@
 main: de.leonheuer.skycave.minievents.MiniEvents
 name: MiniEvents
 authors: [ Hakuyamu ]
-version: 2.0.0
+version: 2.0.1
 api-version: 1.18
 depend: [ SkyBeeCore, Multiverse-Core ]
 
